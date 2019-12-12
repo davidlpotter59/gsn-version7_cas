@@ -1,0 +1,105 @@
+%%
+Screen
+        Name = "casmt016" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Safety Features Discount - Ver. 7.00     %m" ;
+        Domain = "CASSAFETY" ;
+--      resizeable = yes;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASSAFETY:RECORD_KEY <> "SA" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Type:             _     ____________________________________________________ |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Description: ____________________________________________________________    |
+| Factor:      ______                                                          |
+| Description: ____________________________________________________________    |
+| Factor:      ______                                                          |
+| Description: ____________________________________________________________    |
+| Factor:      ______                                                          |
+| Description: ____________________________________________________________    |
+| Factor:      ______                                                          |
+| Description: ____________________________________________________________    |
+| Factor:      ______                                                          |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASSAFETY:RECORD_KEY = "SA"
+            CASSAFETY:FILLER = ""
+            CASSAFETY:DESCRIPTION1 = ""
+            End
+        End
+        CASSAFETY:COMPANY_ID                    Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASSAFETY:STATE                         Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASSAFETY:LINE_OF_BUSINESS              Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASSAFETY:TYPE                          Mandatory
+        If CASSAFETY:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASSAFETY:EFF_DATE                      Mandatory;
+901     CASSAFETY:DESCRIPTION[1];
+1001    CASSAFETY:FACTOR[1];
+1101    CASSAFETY:DESCRIPTION[2];
+1201    CASSAFETY:FACTOR[2];
+1301    CASSAFETY:DESCRIPTION[3];
+1401    CASSAFETY:FACTOR[3];
+1501    CASSAFETY:DESCRIPTION[4];
+1601    CASSAFETY:FACTOR[4];
+1701    CASSAFETY:DESCRIPTION[5];
+1801    CASSAFETY:FACTOR[5];
+
+}
+
+End

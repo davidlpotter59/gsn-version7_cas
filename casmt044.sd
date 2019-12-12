@@ -1,0 +1,90 @@
+%%
+Screen
+        Name = "casmt044" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Personal Auto PIP - Ver 7.00     %m" ;
+        domain="caspip1" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+access validation
+skip if caspip1:record_key not one of "PI" or
+        sfsline:lob_code not one of "PAUTO"
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State:            __     ___________________________________________________ |
+| Line Of Business: ____   ___________________________________________________ |
+| Full Tort:        _                                                          |
+| Territory Code:   ___                                                        |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+|               5,000 Medical     10,000 Medical      $1,000/$5,000 Work Loss  |
+|                   Exp                 Exp             Only-Car    Multi-Car  |
+*------------------------------------------------------------------------------*
+| Charge:           ____                ____             ____         ____     |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     begin
+        if function one of "ADD" then
+            begin
+            caspip1:record_key = "PI"
+            caspip1:filler     = ""
+            end
+        end
+        CASPIP1:COMPANY_ID                      Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASPIP1:STATE                           Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASPIP1:LINE_OF_BUSINESS                Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASPIP1:FULL_TORT/checkbox/values="0,1" ;
+701     CASPIP1:TERRITORY                       Mandatory;
+801     CASPIP1:EFF_DATE                        Mandatory;
+1301    CASPIP1:CHARGE[1];
+1302    caspip1:charge[2];
+1303    caspip1:charge[3];
+1304    caspip1:charge[4];
+
+}
+
+End

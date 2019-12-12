@@ -1,0 +1,97 @@
+%%
+Screen
+        Name = "casmt008" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Collision Deductibles - Ver. 7.00   %m" ;
+        Domain = "CASCOLLDEDUCT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASCOLLDEDUCT:RECORD_KEY <> "CL" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:          __________  ___________________________________________ |
+| State Code:          __    _________________________                         |
+| Line Of Business:    ____  ________________________________________          |
+| Type:                _     _________________________________________________ |
+| Coll Deductible:     _____                                                   |
+| Effective Date:      __________                                              |
+*------------------------------------------------------------------------------*
+| Factor:              _______                                                 |
+| Original Cost Apply: _                                                       |
+| Original Cost:       _____                                                   |
+*------------------------------------------------------------------------------*
+| Allow Agent to View: _                                                       |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASCOLLDEDUCT:RECORD_KEY = "CL"
+            CASCOLLDEDUCT:FILLER = ""
+            CASCOLLDEDUCT:DESCRIPTION = ""
+            End
+        End
+        CASCOLLDEDUCT:COMPANY_ID                Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASCOLLDEDUCT:STATE                     Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASCOLLDEDUCT:LINE_OF_BUSINESS          Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASCOLLDEDUCT:TYPE                      Mandatory
+        If CASCOLLDEDUCT:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASCOLLDEDUCT:COLL_DEDUCTIBLE           Mandatory;
+801     CASCOLLDEDUCT:EFF_DATE                  Mandatory;
+1001    CASCOLLDEDUCT:FACTOR;
+1101    CASCOLLDEDUCT:ORIGINAL_COST_APPLY;
+1201    CASCOLLDEDUCT:ORIGINAL_COST;
+1401    cascolldeduct:allow_agent_to_view/checkbox/values="0,1";
+
+}
+
+End

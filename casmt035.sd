@@ -1,0 +1,81 @@
+%%
+Screen
+        Name = "casmt035" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize= "dynamic" ;
+        Windowtitle = "%a     %s Medical Expense Limits - Ver. 7.00    %m" ;
+        Domain = "CASMEDLIMIT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        ______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ________________________________________       |
+| State Code:       __     _______________                                     |
+| Line Of Business: ____   ________________________________________            |
+| Deductible:       _____                                                      |
+| Limit:            __________                                                 |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Factor:           _________                                                  |
+| Display Deductible in Activehelp: _                                          |
+| Medical Bus:      _________                                                  |
+| Intercity Bus:    _________                                                  |
+| Social Service:   _________                                                  |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASMEDLIMIT:COMPANY_ID                  Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASMEDLIMIT:STATE                       Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASMEDLIMIT:LINE_OF_BUSINESS            Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASMEDLIMIT:DEDUCTIBLE                  Mandatory;
+701     CASMEDLIMIT:LIMIT                       Mandatory;
+801     CASMEDLIMIT:EFF_DATE                    Mandatory;
+1001    CASMEDLIMIT:FACTOR;
+1101    casmedlimit:display/uppercase ;
+1201    casmedlimit:factor_1[1] ;
+1301    casmedlimit:factor_1[2] ;
+1401    casmedlimit:factor_1[3] ;
+
+}
+
+End

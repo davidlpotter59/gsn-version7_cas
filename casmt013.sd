@@ -1,0 +1,93 @@
+%%
+Screen
+        Name = "casmt013" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Rental Reimbursement - Ver. 7.00    %m" ;
+        Domain = "CASRENTAL" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASRENTAL:RECORD_KEY <> "RT" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Minimum Per Day:  ___                                                        |
+| Minimum Days:     ___                                                        |
+| Rental Code:      _______                                                    |
+| Per:              ____                                                       |
+| Specified Cause:  _______                                                    |
+| Comprehensive:    ______                                                     |
+| Collision:        ______                                                     |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASRENTAL:RECORD_KEY = "RT"
+            CASRENTAL:FILLER = ""
+            CASRENTAL:DESCRIPTION = ""
+            End
+        End
+        CASRENTAL:COMPANY_ID                    Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASRENTAL:STATE                         Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASRENTAL:LINE_OF_BUSINESS              Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASRENTAL:EFF_DATE                      Mandatory;
+801     CASRENTAL:MINIMUM_PER_DAY;
+901     CASRENTAL:MINIMUM_DAYS;
+1001    CASRENTAL:RENTAL_CODE;
+1101    CASRENTAL:PER;
+1201    casrental:specified_cause_loss ;
+1301    CASRENTAL:COMP;
+1401    CASRENTAL:COLL;
+
+}
+
+End

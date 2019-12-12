@@ -1,0 +1,127 @@
+%%
+Screen
+        Name = "casmt010" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Hired Autos - Ver. 7.00    %m"
+        Domain = "CASHIRED" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASHIRED:RECORD_KEY <> "HI" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:        __________  ____________________________________________  |
+| State Code:        __    _________________________                           |
+| Line Of Business:  ____  ________________________________________            |
+| Effective Date:    __________                                                |
+| Expiration Date:   __________                                                |
+*------------------------------------------------------------------------------*
+| Liability Rate:    ______       Additional Insured Code:   _______           |
+| Liability Per:     ____         Additional Insured Factor: ______            |
+| Liability Minimum: ______                                                    |
+| Liability Factor   ____                                                      |
+| Liability Limit:   ______                                                    |
+| Phys Dam Per:      ____         Phys Dam Code: ________                      |
+| Phys Dam Minimum:  ___                                                       |
+|                                                                              |
+| Comprehensive    _____   ______    Collision:  _____     _____               |
+|                  _____   ______                _____     _____               |
+|                  _____   ______                _____     _____               |
+|                  _____   ______                _____     _____               |
+|                                                _____     _____               |
+| Specified Cause  _____   _______                                             |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASHIRED:RECORD_KEY = "HI"
+            CASHIRED:FILLER = ""
+            CASHIRED:DESCRIPTION = ""
+            End
+        End
+        CASHIRED:COMPANY_ID                     Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASHIRED:STATE                          Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASHIRED:LINE_OF_BUSINESS               Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASHIRED:EFF_DATE                       Mandatory;
+701     cashired:exp_date ;
+901     CASHIRED:LIABILITY_RATE;
+1001    CASHIRED:LIABILITY_PER;
+1101    CASHIRED:LIABILITY_MINIMUM;
+1201    CASHIRED:LIABILITY_MINIMUM_FACTOR;
+1301    CASHIRED:LIABILITY_LIMIT;
+1401    CASHIRED:PHYS_DAM_PER;
+1402    cashired:physical_damage_code/uppercase ;
+1501    CASHIRED:PHYS_DAM_MINIMUM;
+0902    CASHIRED:ADDITIONAL_INSURED_CODE;
+1002    CASHIRED:ADDITIONAL_INSURED_FACTOR;
+
+1701    CASHIRED:PHYS_DAM_COMP_DEDUCT[1];
+1702    CASHIRED:PHYS_DAM_COMP_RATE[1];
+1801    CASHIRED:PHYS_DAM_COMP_DEDUCT[2];
+1802    CASHIRED:PHYS_DAM_COMP_RATE[2];
+1901    CASHIRED:PHYS_DAM_COMP_DEDUCT[3];
+1902    CASHIRED:PHYS_DAM_COMP_RATE[3];
+2001    CASHIRED:PHYS_DAM_COMP_DEDUCT[4];
+2002    CASHIRED:PHYS_DAM_COMP_RATE[4];
+
+1703    CASHIRED:PHYS_DAM_COLL_DEDUCT[1];
+1704    CASHIRED:PHYS_DAM_COLL_RATE[1];
+1803    CASHIRED:PHYS_DAM_COLL_DEDUCT[2];
+1804    CASHIRED:PHYS_DAM_COLL_RATE[2];
+1903    CASHIRED:PHYS_DAM_COLL_DEDUCT[3];
+1904    CASHIRED:PHYS_DAM_COLL_RATE[3];
+2003    CASHIRED:PHYS_DAM_COLL_DEDUCT[4];
+2004    CASHIRED:PHYS_DAM_COLL_RATE[4];
+2101    CASHIRED:PHYS_DAM_COLL_DEDUCT[5];
+2102    CASHIRED:PHYS_DAM_COLL_RATE[5];
+
+2201    cashired:specified_cause_loss_deduct ;
+2202    cashired:specified_cause_loss_rate ;
+
+}
+
+End

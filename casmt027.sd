@@ -1,0 +1,106 @@
+%%
+Screen
+        Name = "casmt027" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Premier Factors - Ver. 7.00    %m" ;
+        Domain = "CASPREMIER" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASPREMIER:RECORD_KEY <> "PR" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State:                __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| Type:                 _     _______________________________________________  |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Liability:            _____                                                  |
+| Med Pay:              _____                                                  |
+| Comp:                 _____                                                  |
+| Coll:                 _____                                                  |
+| Basic Pip:            _____                                                  |
+| Broadened Pip:        _____                                                  |
+| DOC:                  _____                                                  |
+| Hired Liability:      _____                                                  |
+| Hired Phys Dam:       _____                                                  |
+| Nonowned Liability:   _____                                                  |
+| Motor Bus Passengers: _____                                                  |
+| Rental:               _____                                                  |
+| Package:              _____                                                  |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASPREMIER:RECORD_KEY = "PR"
+            CASPREMIER:FILLER = ""
+            End
+        End
+        CASPREMIER:COMPANY_ID                   Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASPREMIER:STATE                        Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASPREMIER:LINE_OF_BUSINESS             Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASPREMIER:TYPE                         Mandatory;
+602     CASTYPE:DESCRIPTION;
+701     CASPREMIER:EFF_DATE                     Mandatory;
+901     CASPREMIER:LIABILITY;
+1001    CASPREMIER:MED_PAY;
+1101    CASPREMIER:COMP;
+1201    CASPREMIER:COLL;
+1301    CASPREMIER:BASIC_PIP;
+1401    CASPREMIER:BROADENED_PIP;
+1501    CASPREMIER:DOC;
+1601    CASPREMIER:HIRED_LIABILITY;
+1701    CASPREMIER:HIRED_PHYS_DAM;
+1801    CASPREMIER:NONOWNED_LIABILITY;
+1901    CASPREMIER:MOTOR_BUS_PASSENGERS;
+2001    CASPREMIER:RENTAL;
+2101    caspremier:package ;
+
+}
+
+End

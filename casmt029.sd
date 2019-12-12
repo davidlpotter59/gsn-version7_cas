@@ -1,0 +1,115 @@
+%%
+Screen
+        Name = "casmt029" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Stacked Uninsured/Underinsured - Ver 7.00    %m" ;
+        Domain = "CASSTACKED" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASSTACKED:RECORD_KEY <> "ST" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State Code:           __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| UM/UIM:               ___                                                    |
+| Limit:                __________                                             |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Individual                                                                   |
+|   Private Passenger    1        2       3-4      5-9     10-30     >30       |
+*------------------------------------------------------------------------------*
+|                     _______  _______  _______  _______  _______  _______     |
+*------------------------------------------------------------------------------*
+| Individual             1        2       3-4      5-9     10-30     >30       |
+|   All Others                                                                 |
+*------------------------------------------------------------------------------*
+|                     _______  _______  _______  _______  _______  _______     |
+*------------------------------------------------------------------------------*
+| Other Than Individual/Married   PP Types            All Other Vehicles       |
+*------------------------------------------------------------------------------*
+|                                  _______                  _______            |
+*------------------------------------------------------------------------------*
+| Code: _______                                                                |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASSTACKED:RECORD_KEY = "ST"
+            CASSTACKED:FILLER = ""
+            End
+        End
+        CASSTACKED:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASSTACKED:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASSTACKED:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASSTACKED:UM_UIM/uppercase
+        If CASSTACKED:UM_UIM <> "UM" And
+           CASSTACKED:UM_UIM <> "UIM" Then
+            Error "Valid codes are UM or UIM" ;
+701     CASSTACKED:LIMIT;
+801     CASSTACKED:EFF_DATE                   Mandatory;
+
+1301    CASSTACKED:pp_charge[1];
+1302    CASSTACKED:pp_charge[2];
+1303    CASSTACKED:pp_charge[3];
+1304    CASSTACKED:pp_charge[4];
+1305    CASSTACKED:pp_charge[5];
+1306    CASSTACKED:pp_charge[6];
+1801    CASSTACKED:other_charge[1];
+1802    CASSTACKED:other_charge[2] ;
+1803    CASSTACKED:other_charge[3];
+1804    CASSTACKED:other_charge[4] ;
+1805    CASSTACKED:other_charge[5];
+1806    CASSTACKED:other_charge[6] ;
+2201    casstacked:charge_1[1] ;
+2202    casstacked:charge_1[2] ;
+2401    CASSTACKED:CODE;
+
+}
+
+End

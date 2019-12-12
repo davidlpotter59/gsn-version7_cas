@@ -1,0 +1,116 @@
+%%
+Screen
+        Name = "casmt059" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Auto Default File - Ver 7.00     %m" ;
+        domain="agsdefault_cap" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+access validation
+skip if agsdefault_cap:line_of_business not one of 15, 16, 45, 46
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __          ______________________________________________ |
+| Agent Number:     ____        ______________________________________________ |
+| Line Of Business: ____        ______________________________________________ |
+| Form:             _                                                          |
+*------------------------------------------------------------------------------*
+| County:           ___         Territory:        ___                          |
+| Comp Deductible:  _____       Coll Deductible:  _____                        |
+| Liability:        ________    UM/UIM Limit:     ________                     |
+| Medical Payments: ____        Size Class:       _                            |
+| Business Class:   _           Radius:           _                            |
+| Secondary Class:  _           Dumping:          _                            |
+| No Fault:         _           Towing:           _                            |
+| Non Employee:     _           Antitheft:        _                            |
+| Safety:           __          Class Code:       _____                        |
+| liability:        __________  Extend Medical Expense: _                      |
+| Medical Exp Ded:  _____       Schedule Rating:  ______    ______             |
+| IRPM Minimum:     ____        Deviation No not factor: _                     |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     AGSDEFAULT_CAP:COMPANY_ID               Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     AGSDEFAULT_CAP:STATE                    Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     AGSDEFAULT_CAP:AGENT_NO                 Mandatory ;
+/*        if agsdefault_cap:agent_no <> sfsagent:agent_No then
+            error "Invalid Agent Number"
+
+        activehelp sfsagent_alias:agent_no,
+                   sfsagent_alias:name[1] ;*/
+502     sfsagent:Name[1] ;
+601     AGSDEFAULT_CAP:LINE_OF_BUSINESS         Mandatory
+        include "linehlp.inc"
+602     sfsline:description ;
+701     AGSDEFAULT_CAP:FORM ;
+901     AGSDEFAULT_CAP:COUNTY
+        include "countyhlp.inc"
+902     AGSDEFAULT_CAP:TERRITORY;
+1001    AGSDEFAULT_CAP:COMP_DEDUCTIBLE;
+1002    AGSDEFAULT_CAP:COLL_DEDUCTIBLE;
+1101    AGSDEFAULT_CAP:LIABILITY;
+1102    AGSDEFAULT_CAP:UM_UIM_LIMIT;
+1201    AGSDEFAULT_CAP:MEDICAL_PAYMENTS;
+1202    AGSDEFAULT_CAP:SIZE_CLASS;
+1301    AGSDEFAULT_CAP:BUSINESS_CLASS;
+1302    AGSDEFAULT_CAP:RADIUS;
+1401     AGSDEFAULT_CAP:SECONDARY_CLASS;
+1402     AGSDEFAULT_CAP:DUMPING;
+1501    AGSDEFAULT_CAP:NO_FAULT;
+1502    AGSDEFAULT_CAP:TOWING;
+1601    AGSDEFAULT_CAP:NON_EMPLOYEE;
+1602    AGSDEFAULT_CAP:ANTITHEFT[1];
+1701    AGSDEFAULT_CAP:SAFETY;
+1702    agsdefault_cap:class_code ;
+1801    agsdefault_cap:rating_liability_limit ;
+1802    agsdefault_cap:extend_medical_expense/checkbox/values="N,Y" ;
+1901    agsdefault_cap:pip_deductible ;
+1902    agsdefault_cap:schedule_rating[1] ;
+1903    agsdefault_cap:schedule_rating[2] ;
+2001    agsdefault_cap:irpm_minimum ;
+2002    agsdefault_cap:deviation_number_not_factor/checkbox/values="0,1" ;
+
+}
+
+End

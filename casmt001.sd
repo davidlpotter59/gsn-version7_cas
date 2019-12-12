@@ -1,0 +1,106 @@
+%%
+Screen
+        Name = "casmt001" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Liability Premiums - Ver. 7.00     %m" ;
+        Domain = "CASLIABILITY" ;
+--      resizeable = yes;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASLIABILITY:RECORD_KEY <> "LI"
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  _____________________________________________  |
+| State:            __    ____________________                                 |
+| Line Of Business: ____  ________________________________________             |
+| Type:             _     ___________________________________________________  |
+| Territory Code:   ___                                                        |
+| No Fault:         _                                                          |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+| Limit:  __________ __________ __________ __________ __________ __________    |
+| Charge: _____      _____      _____      _____      _____      _____         |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASLIABILITY:RECORD_KEY = "LI"
+            CASLIABILITY:FILLER = ""
+            CASLIABILITY:DESCRIPTION = ""
+            End
+        End
+        CASLIABILITY:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASLIABILITY:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASLIABILITY:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASLIABILITY:TYPE                       Mandatory
+        If CASLIABILITY:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASLIABILITY:TERRITORY                  Mandatory;
+801     CASLIABILITY:NO_FAULT                   Mandatory;
+901     CASLIABILITY:EFF_DATE                   Mandatory;
+1001    casliability:exp_date ;
+1201    CASLIABILITY:LIMIT[1];
+1301    CASLIABILITY:CHARGE[1];
+1202    CASLIABILITY:LIMIT[2];
+1302    CASLIABILITY:CHARGE[2];
+1203    CASLIABILITY:LIMIT[3];
+1303    CASLIABILITY:CHARGE[3];
+1204    CASLIABILITY:LIMIT[4];
+1304    CASLIABILITY:CHARGE[4];
+1205    CASLIABILITY:LIMIT[5];
+1305    CASLIABILITY:CHARGE[5];
+1206    CASLIABILITY:LIMIT[6];
+1306    CASLIABILITY:CHARGE[6];
+
+}
+
+End

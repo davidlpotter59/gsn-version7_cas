@@ -1,0 +1,102 @@
+%%
+Screen
+        Name = "casmt022" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Uninsured/Underinsured Motorists - Ver. 7.00    %m"
+        Domain = "CASUMUIM" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASUMUIM:RECORD_KEY <> "UM" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State:            __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Limit:            __________                                                 |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+|                           Individuals                All Others              |
+| Private Passenger:           ___                         ___                 |
+| All Other Vehicles:          ___                         ___                 |
+|                                                                              |
+| Factor:                                                                      |
+| Private Passenger:          ______                                           |
+| All Other Vehicles:         ______                                           |
+*------------------------------------------------------------------------------*
+| Allow Agent to View:        _                                                |
+*------------------------------------------------------------------------------*
+| Property Damage:   PP: __  All Other: __                                     |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASUMUIM:RECORD_KEY = "UM"
+            CASUMUIM:FILLER = ""
+            CASUMUIM:DESCRIPTION = ""
+            End
+        End
+        CASUMUIM:COMPANY_ID                     Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASUMUIM:STATE                          Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASUMUIM:LINE_OF_BUSINESS               Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASUMUIM:LIMIT                          Mandatory;
+701     CASUMUIM:EFF_DATE                       Mandatory;
+1001    CASUMUIM:CHARGE[1];
+1101    CASUMUIM:CHARGE[2];
+1002    CASUMUIM:CHARGE[3];
+1102    CASUMUIM:CHARGE[4];
+1401    CASUMUIM:FACTOR[1];
+1501    casumuim:factor[2] ;
+
+1701    casumuim:allow_agent_to_View/checkbox/values="0,1" ;
+
+1901    casumuim:property_damage[1] ;
+1902    casumuim:property_damage[2] ;
+
+}
+
+End

@@ -1,0 +1,104 @@
+%%
+Screen
+        Name = "casmt032" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Combined 1st Party Benefits (PA) - Ver. 7.00    %m" ;
+        Domain = "CASCOMBINED" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASCOMBINED:RECORD_KEY <> "CO" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State Code:           __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Maximum Total        Funeral Expense      Accidental Death                   |
+| Combined Limit       Benefits Limit       Benefits Limit         Premium     |
+*------------------------------------------------------------------------------*
+|  ________                _____               ________            _______     |
+|  ________                _____               ________            _______     |
+|  ________                _____               ________            _______     |
+|  ________                _____               ________            _______     |
+*------------------------------------------------------------------------------*
+| Code: _______                       Seating:  _______                        |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASCOMBINED:RECORD_KEY = "CO"
+            CASCOMBINED:FILLER = ""
+            End
+        End
+        CASCOMBINED:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASCOMBINED:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASCOMBINED:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASCOMBINED:EFF_DATE                   Mandatory;
+1101    CASCOMBINED:COMBINED_LIMIT[1];
+1102    CASCOMBINED:FUNERAL_LIMIT[1];
+1103    CASCOMBINED:ACCIDENT_LIMIT[1];
+1104    CASCOMBINED:CHARGE_1[1];
+1201    CASCOMBINED:COMBINED_LIMIT[2];
+1202    CASCOMBINED:FUNERAL_LIMIT[2];
+1203    CASCOMBINED:ACCIDENT_LIMIT[2];
+1204    CASCOMBINED:CHARGE_1[2];
+1301    CASCOMBINED:COMBINED_LIMIT[3];
+1302    CASCOMBINED:FUNERAL_LIMIT[3];
+1303    CASCOMBINED:ACCIDENT_LIMIT[3];
+1304    CASCOMBINED:CHARGE_1[3];
+1401    CASCOMBINED:COMBINED_LIMIT[4];
+1402    CASCOMBINED:FUNERAL_LIMIT[4];
+1403    CASCOMBINED:ACCIDENT_LIMIT[4];
+1404    CASCOMBINED:CHARGE_1[4];
+1601    CASCOMBINED:CODE;
+1602    cascombined:seating_factor ;
+
+}
+
+End

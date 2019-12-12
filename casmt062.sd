@@ -1,0 +1,81 @@
+%%
+Screen
+        Name = "casmt062" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Paratransit Comp/Coll - Ver 7.00     %m" ;
+        domain="castransitcompcoll" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __          ______________________________________________ |
+| Line Of Business: ____        ______________________________________________ |
+| Territory Code:   ___                                                        |
+| Class Code:       _____                                                      |
+| Comp:             _____                                                      |
+| Coll:             _____                                                      |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+| Unit Charge:        ____                                                     |
+| Factor:           ______                                                     |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASTRANSITCOMPCOLL:COMPANY_ID           Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASTRANSITCOMPCOLL:STATE                Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASTRANSITCOMPCOLL:LINE_OF_BUSINESS     Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASTRANSITCOMPCOLL:TERRITORY            Mandatory;
+701     castransitcompcoll:class_code           mandatory ;
+801     CASTRANSITCOMPCOLL:COMP                 Mandatory;
+901     CASTRANSITCOMPCOLL:COLL                 Mandatory;
+1001    CASTRANSITCOMPCOLL:EFF_DATE             Mandatory;
+1101    CASTRANSITCOMPCOLL:EXP_DATE;
+1301    CASTRANSITCOMPCOLL:UNIT_CHARGE;
+1401    CASTRANSITCOMPCOLL:FACTOR;
+
+}
+
+End

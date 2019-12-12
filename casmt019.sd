@@ -1,0 +1,84 @@
+%%
+Screen
+        Name = "casmt019" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Size Classes - Ver. 7.00    %m" ;
+        Domain = "CASSIZE" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASSIZE:RECORD_KEY <> "SI" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Size:             _                                                          |
+*------------------------------------------------------------------------------*
+|               __________________________________________________             |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASSIZE:RECORD_KEY = "SI"
+            CASSIZE:FILLER = ""
+            CASSIZE:DESCRIPTION1 = ""
+            End
+        End
+        CASSIZE:COMPANY_ID                      Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASSIZE:STATE                           Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASSIZE:LINE_OF_BUSINESS                Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASSIZE:SIZE                            Mandatory;
+801     CASSIZE:DESCRIPTION/freetextlines=5 ;
+
+}
+
+End

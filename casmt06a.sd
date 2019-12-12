@@ -1,0 +1,88 @@
+%%
+Screen
+        Name = "Casmt06a" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Increased Liability Limits - PA - Ver. 7.00   %m" ;
+        Domain = "CASINCRLIAB" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASINCRLIAB:RECORD_KEY <> "IL" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  _____________________________________________  |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Coverage Limit:   __________                                                 |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Ligh/Medium    Heavy      Extra Heavy    Trucks Zoned     Other              |
+|  ______        ______      ______           ______        ______             |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASINCRLIAB:RECORD_KEY = "IL"
+            CASINCRLIAB:FILLER = ""
+            CASINCRLIAB:DESCRIPTION = ""
+            End
+        End
+        CASINCRLIAB:COMPANY_ID                  Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASINCRLIAB:STATE                       Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASINCRLIAB:LINE_OF_BUSINESS            Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASINCRLIAB:LIMIT                       Mandatory;
+701     CASINCRLIAB:EFF_DATE                    Mandatory;
+1001    CASINCRLIAB:FACTOR_1[1];
+1002    CASINCRLIAB:FACTOR_1[2];
+1003    CASINCRLIAB:FACTOR_1[3];
+1004    casincrliab:factor_1[4] ;
+1005    casincrliab:factor_1[5] ;
+
+}
+
+End

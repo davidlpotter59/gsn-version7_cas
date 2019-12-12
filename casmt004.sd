@@ -1,0 +1,96 @@
+%%
+Screen
+        Name = "casmt004" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s PIP Premiums (Private Passenger) - Ver. 7.00    %m" ;
+        Domain = "CASPIP" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASPIP:RECORD_KEY <> "PI" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __     _________________________                           |
+| Line Of Business: ____   ________________________________________            |
+| Type:             _      ___________________________________________________ |
+| Territory Code:   ___                                                        |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+|            Non-Employee                     Employee                         |
+|                                                                              |
+| Charge:       ____                           ____                            |
+*------------------------------------------------------------------------------*
+
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASPIP:RECORD_KEY = "PI"
+            CASPIP:FILLER = ""
+            CASPIP:DESCRIPTION = ""
+            End
+        End
+        CASPIP:COMPANY_ID                       Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASPIP:STATE                            Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASPIP:LINE_OF_BUSINESS                 Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASPIP:TYPE                             Mandatory
+        If CASPIP:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASPIP:TERRITORY                        Mandatory;
+801     CASPIP:EFF_DATE                         Mandatory;
+901     caspip:exp_date ;
+1301    CASPIP:CHARGE[1];
+1302    CASPIP:CHARGE[2];
+
+}
+
+End

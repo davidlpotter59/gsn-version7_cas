@@ -1,0 +1,116 @@
+%%
+Screen
+        Name = "casmt011" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Non-Owned Auto Liability - Ver. 7.00    %m" ;
+        Domain = "CASNONOWNED" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASNONOWNED:RECORD_KEY <> "NO" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:        __________  _____________________________________________ |
+| State Code:        __    _________________________                           |
+| Line Of Business:  ____  ________________________________________            |
+| Effective Date:    __________                                                |
+*------------------------------------------------------------------------------*
+| Limit:                   ______                                              |
+| Percent:                 __                                                  |
+| Employee Insured Code:   _______                                             |
+| Employee Insured Factor: ______                                              |
+| Partner Factor:          _____                                               |
+| Liability Factor:        ____                                                |
+| Addl Insured Code:       _______  ____                                       |
+| Non-owned Auto Service:  _____                                               |
+| Non-owned Partnership:   _____                                               |
+|                                                                              |
+|           Employees: _____        Premium:        ________                   |
+|                      _____                        ________                   |
+|                      _____                        ________                   |
+|                      _____                        ________                   |
+|                      _____                        ________                   |
+|                      _____                        ________                   |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASNONOWNED:RECORD_KEY = "NO"
+            CASNONOWNED:FILLER = ""
+            CASNONOWNED:DESCRIPTION = ""
+            End
+        End
+        CASNONOWNED:COMPANY_ID                  Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASNONOWNED:STATE                       Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASNONOWNED:LINE_OF_BUSINESS            Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASNONOWNED:EFF_DATE                    Mandatory;
+801     CASNONOWNED:NONOWNED_LIAB_LIMIT;
+901     CASNONOWNED:PERCENT;
+1001    CASNONOWNED:EMPLOYEE_INSURED_CODE;
+1101    CASNONOWNED:EMPLOYEE_INSURED_FACTOR;
+1201    CASNONOWNED:PARTNER_FACTOR;
+1301    CASNONOWNED:LIABILITY_MINIMUM_FACTOR;
+1401    casnonowned:additional_insured_code/uppercase ;
+1402    casnonowned:additional_insured_factor ;
+1501    casnonowned:nonowned_auto_service ;
+1601    casnonowned:nonowned_partnership ;
+1801    CASNONOWNED:EMPLOYEES[1];
+1802    CASNONOWNED:EMPLOYEES_PREMIUM[1];
+1901    CASNONOWNED:EMPLOYEES[2];
+1902    CASNONOWNED:EMPLOYEES_PREMIUM[2];
+2001    CASNONOWNED:EMPLOYEES[3];
+2002    CASNONOWNED:EMPLOYEES_PREMIUM[3];
+2101    CASNONOWNED:EMPLOYEES[4];
+2102    CASNONOWNED:EMPLOYEES_PREMIUM[4];
+2201    CASNONOWNED:EMPLOYEES[5];
+2202    CASNONOWNED:EMPLOYEES_PREMIUM[5];
+2301    CASNONOWNED:EMPLOYEES[6];
+2302    CASNONOWNED:EMPLOYEES_PREMIUM[6];
+
+}
+
+End

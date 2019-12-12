@@ -1,0 +1,99 @@
+%%
+Screen
+        Name = "casmt007" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Comprehensive Deductibles - Ver. 7.00    %m" ;
+        Domain = "CASCOMPDEDUCT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASCOMPDEDUCT:RECORD_KEY <> "CP" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:          __________  ___________________________________________ |
+| State Code:          __    _________________________                         |
+| Line Of Business:    ____  ________________________________________          |
+| Type:                _     _________________________________________________ |
+| Comp Deductible:     _____                                                   |
+| Effective Date:      __________                                              |
+*------------------------------------------------------------------------------*
+| Description:         ____________________                                    |
+| Factor:              _______                                                 |
+| Original Cost Apply: _                                                       |
+| Original Cost:       _____                                                   |
+*------------------------------------------------------------------------------*
+| Allow Agent to View: _                                                       |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASCOMPDEDUCT:RECORD_KEY = "CP"
+            CASCOMPDEDUCT:FILLER = ""
+            CASCOMPDEDUCT:DESCRIPTION1 = ""
+            End
+        End
+        CASCOMPDEDUCT:COMPANY_ID                Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASCOMPDEDUCT:STATE                     Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASCOMPDEDUCT:LINE_OF_BUSINESS          Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASCOMPDEDUCT:TYPE
+        If CASCOMPDEDUCT:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASCOMPDEDUCT:COMP_DEDUCTIBLE           Mandatory;
+801     CASCOMPDEDUCT:EFF_DATE                  Mandatory;
+1001    CASCOMPDEDUCT:DESCRIPTION;
+1101    CASCOMPDEDUCT:FACTOR;
+1201    CASCOMPDEDUCT:ORIGINAL_COST_APPLY;
+1301    CASCOMPDEDUCT:ORIGINAL_COST;
+
+1501    cascompdeduct:allow_agent_to_view/checkbox/values="0,1" ;
+
+}
+
+End

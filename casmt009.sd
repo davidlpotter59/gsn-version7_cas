@@ -1,0 +1,131 @@
+%%
+Screen
+        Name = "casmt009" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Optional Rates - Ver. 7.00    %m" ;
+        Domain = "CASRATE" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASRATE:RECORD_KEY <> "RA" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Farm Factor:            _____     Motor Home Contents Code:     _______      |
+| Buses Liab Code:        _______   Motor Home Contents Per:      ____         |
+| Flower Cars Liab:       _____     Motor Home Contents Deduct:   _____        |
+| Flower Cars Phys Dam: _____ _____ Motor Home Rate:              _____        |
+| Limo Liab:              _____     Audio Code:                   _______      |
+| Limo Phys Dam:          _____     Audio Per:                    ____         |
+| Funeral Hired Nonowned: _____     Audio Deductible:             _____        |
+| Plates Factor:          ______    Audio Rate:                   ______       |
+| Plates Per:             __        Chassis:                      ______       |
+| Plates Code:            _______   Stated Amount Basis:          _______      |
+| Motor Home Code:        _______   UM/UIM Code:                  _______      |
+| Motor Home Liab:        _____     Medical Exp Motor Bus Code:   _______      |
+| Motor Home Phys Dam:    _____     Company Package Rate:         ____         |
+| Personal Injury Waiver: _____     Loss Payee Code:              _______      |
+| Auto Termination Code:  _______   Liability Fleet Factor:       ______       |
+| Comp Fleet Factor:      ______    Collision Fleet Factor:       ______       |
+| Garagekeepers Form:     _______   Companion Discount Factor:    ______       |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASRATE:RECORD_KEY = "RA"
+            CASRATE:FILLER = ""
+            CASRATE:DESCRIPTION = ""
+            End
+        End
+        CASRATE:COMPANY_ID                      Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASRATE:STATE                           Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASRATE:LINE_OF_BUSINESS                Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASRATE:EFF_DATE                        Mandatory;
+801     CASRATE:FARM_FACTOR;
+901     CASRATE:BUSES_LIAB_CODE;
+1001    CASRATE:FLOWER_CARS_LIAB;
+1101    CASRATE:FLOWER_CARS_PHYS_DAM;
+1102    casrate:flower_cars_phys_dam_1 ;
+1201    CASRATE:LIMO_LIAB;
+1301    CASRATE:LIMO_PHYS_DAM;
+1401    CASRATE:FUNERAL_HIRED_NONOWNED;
+1501    CASRATE:PLATES_FACTOR;
+1601    CASRATE:PLATES_PER;
+1701    CASRATE:PLATES_CODE;
+1801    CASRATE:MOTOR_HOME_CODE;
+1901    CASRATE:MOTOR_HOME_LIAB;
+2001    CASRATE:MOTOR_HOME_PHYS_DAM;
+2101    casrate:personal_injury_waiver ;
+2201    casrate:auto_termination_code ;
+2301    casrate:comp_fleet ;
+2401    casrate:garagekeepers_form/uppercase ;
+
+802     CASRATE:MOTOR_HOME_CONTENTS_CODE;
+902     CASRATE:MOTOR_HOME_CONTENTS_PER;
+1002    CASRATE:MOTOR_HOME_CONTENTS_DEDUCT;
+1103    CASRATE:MOTOR_HOME_RATE;
+1202    CASRATE:AUDIO_CODE;
+1302    CASRATE:AUDIO_PER;
+1402    CASRATE:AUDIO_DEDUCTIBLE;
+1502    CASRATE:AUDIO_RATE;
+1602    CASRATE:CHASSIS;
+1702    CASRATE:STATED_BASIS_CODE;
+1802    CASRATE:UM_UIM_CODE;
+1902    CASRATE:MEDICAL_EXP_MOTOR_BUS_CODE;
+2002    CASRATE:COMPANY_PACKAGE;
+2102    casrate:loss_payee_code ;
+2202    casrate:liability_fleet ;
+2302    casrate:coll_fleet ;
+2402    casrate:companion_discount_factor ;
+
+}
+
+End

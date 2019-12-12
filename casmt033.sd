@@ -1,0 +1,125 @@
+%%
+Screen
+        Name = "casmt033" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s No Fault Coverages (PA) - Ver. 7.00     %m" ;
+        Domain = "CASPANOFAULT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASPANOFAULT:RECORD_KEY <> "PA" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State Code:           __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Broadened Code:       _______                                                |
+| Broadened Charge:     _______                                                |
+*------------------------------------------------------------------------------*
+| Additional/Combo Code: _______                                               |
+| Extraordinary Medical Benefits                                               |
+|                                                                              |
+| Extraordinary Code:   _______                                                |
+|                                                                              |
+|       Limit                      Table 1                    Table 2          |
+|                                                                              |
+|     ________                     _______                    _______          |
+|     ________                     _______                    _______          |
+|     ________                     _______                    _______          |
+|     ________                     _______                    _______          |
+*------------------------------------------------------------------------------*
+| Seating Capacity                              Factor                         |
+| __________                                    ______                         |
+| __________                                    ______                         |
+| __________                                    ______                         |
+| __________                                    ______                         |
+*------------------------------------------------------------------------------*
+| Basic Code:  ________                    PIP Code: ________                  |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASPANOFAULT:RECORD_KEY = "PA"
+            CASPANOFAULT:FILLER = ""
+            End
+        End
+        CASPANOFAULT:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASPANOFAULT:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASPANOFAULT:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASPANOFAULT:EFF_DATE                   Mandatory;
+801     CASPANOFAULT:BROADENED_CODE;
+901     CASPANOFAULT:BROADENED_CHARGE_1;
+1101    CASPANOFAULT:ADDITIONAL_CODE/uppercase ;
+1401    CASPANOFAULT:EXTRA_CODE;
+1801    CASPANOFAULT:EXTRA_LIMIT[1];
+1802    CASPANOFAULT:EXTRA_TABLE_3[1];
+1803    CASPANOFAULT:EXTRA_TABLE_4[1];
+1901    CASPANOFAULT:EXTRA_LIMIT[2];
+1902    CASPANOFAULT:EXTRA_TABLE_3[2];
+1903    CASPANOFAULT:EXTRA_TABLE_4[2];
+2001    CASPANOFAULT:EXTRA_LIMIT[3];
+2002    CASPANOFAULT:EXTRA_TABLE_3[3];
+2003    CASPANOFAULT:EXTRA_TABLE_4[3];
+2101    CASPANOFAULT:EXTRA_LIMIT[4];
+2102    CASPANOFAULT:EXTRA_TABLE_3[4];
+2103    CASPANOFAULT:EXTRA_TABLE_4[4];
+2401    caspanofault:seating_capacity[1] ;
+2402    caspanofault:seating_capacity_factor[1] ;
+2501    caspanofault:seating_capacity[2] ;
+2502    caspanofault:seating_capacity_factor[2] ;
+2601    caspanofault:seating_capacity[3] ;
+2602    caspanofault:seating_capacity_factor[3] ;
+2701    caspanofault:seating_capacity[4] ;
+2702    caspanofault:seating_capacity_factor[4] ;
+2901    caspanofault:basic_benefit_code/uppercase ;
+2902    caspanofault:pip_code/uppercase ;
+
+}
+
+End

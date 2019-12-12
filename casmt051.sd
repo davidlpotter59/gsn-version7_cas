@@ -1,0 +1,75 @@
+%%
+Screen
+        Name = "casmt051" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Garagekeepers Form - Ver 7.00     %m" ;
+        domain="casgarageform" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        ______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __      __________________________________________________ |
+| Line Of Business: ____    __________________________________________________ |
+| Form:             _                                                          |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+| Description:      __________________________________________________         |
+| Rate Form:           _                                                       |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASGARAGEFORM:COMPANY_ID                Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASGARAGEFORM:STATE                     Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASGARAGEFORM:LINE_OF_BUSINESS          Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASGARAGEFORM:FORM                      Mandatory;
+701     CASGARAGEFORM:EFF_DATE                  Mandatory;
+801     CASGARAGEFORM:EXP_DATE;
+1001    CASGARAGEFORM:DESCRIPTION;
+1101    CASGARAGEFORM:RATE_FORM;
+
+}
+
+End

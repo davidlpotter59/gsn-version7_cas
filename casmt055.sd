@@ -1,0 +1,79 @@
+%%
+Screen
+        Name = "casmt055" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Other Class Code Rates - Ver. 7.00    %m" ;
+        Domain = "casotherrates" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  _____________________________________________  |
+| State:            __    ____________________                                 |
+| Line Of Business: ____  ________________________________________             |
+| Class Code:       _____                                                      |
+| Eff Date:         __________                                                 |
+| Exp Date:         __________                                                 |
+*------------------------------------------------------------------------------*
+| Liability Factor:       ______                                               |
+| Physical Damage Factor: ______  ______                                       |
+| Rate Type:              _                                                    |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     casotherrates:COMPANY_ID                      Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     casotherrates:STATE                           Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     casotherrates:LINE_OF_BUSINESS                Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     casotherrates:class_code                      Mandatory ;
+701     casotherrates:eff_date ;
+801     casotherrates:exp_date ;
+1001    casotherrates:liability_factor ;
+1101    casotherrates:physical_damage_factor ;
+1102    casotherrates:physical_damage_coll ;
+1201    casotherrates:rate_type ;
+
+}
+
+End

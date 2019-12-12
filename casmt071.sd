@@ -1,0 +1,73 @@
+%%
+Screen
+        Name = "casmt071" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Garaging Scores - Ver 7.00     %m" ;
+        domain="casgaraging" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        ________________
+*------------------------------------------------------------------------------*
+| Company Id:            __________  _________________________________________ |
+| State Code:            __          _________________________________________ |
+| Line Of Business:      ____        _________________________________________ |
+| Territory Description: __________________________________________________    |
+| Effective Date:        __________                                            |
+| Expiration Date:       __________                                            |
+*------------------------------------------------------------------------------*
+| Score:                 ______                                                |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASGARAGING:COMPANY_ID                  Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASGARAGING:STATE                       Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASGARAGING:LINE_OF_BUSINESS            Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASGARAGING:TERRITORY_DESCRIPTION       Mandatory;
+701     CASGARAGING:EFF_DATE                    Mandatory;
+801     CASGARAGING:EXP_DATE;
+1001    CASGARAGING:SCORE;
+
+}
+
+End

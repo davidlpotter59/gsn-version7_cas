@@ -1,0 +1,105 @@
+%%
+Screen
+        Name = "casmt015" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Antitheft Vehicle Discounts - Ver. 7.00    %m" ;
+        Domain = "CASANTITHEFT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASANTITHEFT:RECORD_KEY <> "AT" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Type:             _     ____________________________________________________ |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASANTITHEFT:RECORD_KEY = "AT"
+            CASANTITHEFT:FILLER = ""
+            CASANTITHEFT:DESCRIPTION1 = ""
+            End
+        End
+        CASANTITHEFT:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASANTITHEFT:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASANTITHEFT:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASANTITHEFT:TYPE                       Mandatory
+        If CASANTITHEFT:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASANTITHEFT:EFF_DATE                   Mandatory;
+901     CASANTITHEFT:DESCRIPTION[1];
+1001    CASANTITHEFT:FACTOR[1];
+1101    CASANTITHEFT:DESCRIPTION[2];
+1201    CASANTITHEFT:FACTOR[2];
+1301    CASANTITHEFT:DESCRIPTION[3];
+1401    CASANTITHEFT:FACTOR[3];
+1501    CASANTITHEFT:DESCRIPTION[4];
+1601    CASANTITHEFT:FACTOR[4];
+1701    CASANTITHEFT:DESCRIPTION[5];
+1801    CASANTITHEFT:FACTOR[5];
+
+}
+
+End

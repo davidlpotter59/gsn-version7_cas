@@ -1,0 +1,90 @@
+%%
+Screen
+        Name = "casmt045" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Expense Fees - Ver 7.00     %m" ;
+        domain="casexpfees" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+access validation
+skip if casexpfees:record_key not one of "EF" or
+        sfsline:lob_code not one of "PAUTO"
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State:            __    ____________________________________________________ |
+| Line Of Business: ____  ____________________________________________________ |
+| Full Tort:        _                                                          |
+| Territory Code:   ___                                                        |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Single Limit Liability:  ____                                                |
+| First Party Benefits:    ____                                                |
+| Comprehensive:           ____                                                |
+| Collision:               ____                                                |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     begin
+        if function one of "ADD" then
+            begin
+            casexpfees:record_key = "EF"
+            casexpfees:filler     = ""
+            end
+        end
+        CASEXPFEES:COMPANY_ID                   Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASEXPFEES:STATE                        Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASEXPFEES:LINE_OF_BUSINESS             Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASEXPFEES:FULL_TORT/checkbox/values="0,1" ;
+701     CASEXPFEES:TERRITORY                    Mandatory;
+801     CASEXPFEES:EFF_DATE                     Mandatory;
+1001    CASEXPFEES:CHARGE[1];
+1101    casexpfees:charge[2];
+1201    casexpfees:charge[3];
+1301    casexpfees:charge[4];
+
+}
+
+End

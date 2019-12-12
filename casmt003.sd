@@ -1,0 +1,127 @@
+%%
+Screen
+        Name = "casmt003" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Physical Damage Premiums - Ver. 7.00    %m" ;
+        Domain = "CASCOMPCOLL" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASCOMPCOLL:RECORD_KEY <> "PD" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Type:             _     ____________________________________________________ |
+| Dumping:          _                                                          |
+| Original Cost:    ________                                                   |
+| Age:              __                                                         |
+| Territory:        ___                                                        |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+|  Comprehensive - Deductible                 Collision - Deductible           |
+|                                                                              |
+| _____  _____  _____  _____            _____  _____  _____  _____  _____      |
+| _____  _____  _____  _____            _____  _____  _____  _____  _____      |
+*------------------------------------------------------------------------------*
+
+
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASCOMPCOLL:RECORD_KEY = "PD"
+            CASCOMPCOLL:FILLER = ""
+            CASCOMPCOLL:DESCRIPTION = ""
+            End
+        End
+        CASCOMPCOLL:COMPANY_ID                  Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASCOMPCOLL:STATE                       Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASCOMPCOLL:LINE_OF_BUSINESS            Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASCOMPCOLL:TYPE                        Mandatory
+        If CASCOMPCOLL:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASCOMPCOLL:DUMPING                     Mandatory;
+801     CASCOMPCOLL:ORIGINAL_COST               Mandatory;
+901     CASCOMPCOLL:AGE                         Mandatory;
+1001    cascompcoll:territory                   Mandatory ;
+1101    CASCOMPCOLL:EFF_DATE                    Mandatory;
+1201    cascompcoll:exp_date ;
+1601    CASCOMPCOLL:COMP_DEDUCTIBLE[1];
+1701    CASCOMPCOLL:COMP_DEDUCTIBLE_RATE[1];
+
+1602    CASCOMPCOLL:COMP_DEDUCTIBLE[2];
+1702    CASCOMPCOLL:COMP_DEDUCTIBLE_RATE[2];
+
+1603    CASCOMPCOLL:COMP_DEDUCTIBLE[3];
+1703    CASCOMPCOLL:COMP_DEDUCTIBLE_RATE[3];
+
+1604    CASCOMPCOLL:COMP_DEDUCTIBLE[4];
+1704    CASCOMPCOLL:COMP_DEDUCTIBLE_RATE[4];
+
+1605    CASCOMPCOLL:COLL_DEDUCTIBLE[1];
+1705    CASCOMPCOLL:COLL_DEDUCTIBLE_RATE[1];
+
+1606    CASCOMPCOLL:COLL_DEDUCTIBLE[2];
+1706    CASCOMPCOLL:COLL_DEDUCTIBLE_RATE[2];
+
+1607    CASCOMPCOLL:COLL_DEDUCTIBLE[3];
+1707    CASCOMPCOLL:COLL_DEDUCTIBLE_RATE[3];
+
+1608    CASCOMPCOLL:COLL_DEDUCTIBLE[4];
+1708    CASCOMPCOLL:COLL_DEDUCTIBLE_RATE[4];
+
+1609    CASCOMPCOLL:COLL_DEDUCTIBLE[5];
+1709    CASCOMPCOLL:COLL_DEDUCTIBLE_RATE[5];
+
+}
+
+End

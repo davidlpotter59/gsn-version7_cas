@@ -1,0 +1,108 @@
+%%
+Screen
+        Name = "casmt047" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Uninsured/Underinsured - Ver 7.00     %m" ;
+        domain="casumuim1" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+access validation
+skip if casumuim1:record_key not one of "UM" or
+        sfsline:lob_code not one of "PAUTO"
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    ____________________________________________________ |
+| Line Of Business: ____  ____________________________________________________ |
+| Territory Code:   ___                                                        |
+| Coverage Limit:   __________                                                 |
+| Full Tort:        _                                                          |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Uninsured Motorists                                                          |
+| Stacked                                                                      |
+|          Only  - Car:  _____                                                 |
+|          Multi - Car:  _____                                                 |
+| Nonstacked                                                                   |
+|          Only  - Car:  _____                                                 |
+|          Multi - Car:  _____                                                 |
+*------------------------------------------------------------------------------*
+| Underinsured Motorists                                                       |
+| Stacked                                                                      |
+|          Only  - Car:  _____                                                 |
+|          Multi - Car:  _____                                                 |
+| Nonstacked                                                                   |
+|          Only  - Car:  _____                                                 |
+|          Multi - Car:  _____                                                 |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     begin
+        if function one of "ADD" then
+            begin
+            casumuim1:record_key = "UM"
+            casumuim1:filler     = ""
+            end
+        end
+        CASUMUIM1:COMPANY_ID                    Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASUMUIM1:STATE                         Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASUMUIM1:LINE_OF_BUSINESS              Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASUMUIM1:TERRITORY                     Mandatory;
+701     CASUMUIM1:LIMIT                         Mandatory;
+801     CASUMUIM1:FULL_TORT/checkbox/values="0,1" ;
+901     CASUMUIM1:EFF_DATE                      Mandatory;
+1301    CASUMUIM1:STACKED[1];
+1401    CASUMUIM1:STACKED[2];
+1601    CASUMUIM1:NONSTACKED[1];
+1701    CASUMUIM1:NONSTACKED[2];
+2101    CASUMUIM1:STACKED[3];
+2201    CASUMUIM1:STACKED[4];
+2401    CASUMUIM1:NONSTACKED[3];
+2501    CASUMUIM1:NONSTACKED[4];
+
+}
+
+End

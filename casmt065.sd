@@ -1,0 +1,70 @@
+%%
+Screen
+        Name = "casmt065" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Medical Payments - Ver 7.00     %m" ;
+        domain="casmedical" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                   ______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __          ______________________________________________ |
+| Line Of Business: ____        ______________________________________________ |
+| Medical Payments: ________                                                   |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASMEDICAL:COMPANY_ID                   Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASMEDICAL:STATE                        Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASMEDICAL:LINE_OF_BUSINESS             Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASMEDICAL:MEDICAL_PAYMENTS             Mandatory;
+701     CASMEDICAL:EFF_DATE                     Mandatory;
+801     CASMEDICAL:EXP_DATE;
+
+}
+
+End

@@ -1,0 +1,153 @@
+%%
+Screen
+        Name = "casmt025" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s No Fault Coverages (NJ) - Ver. 7.00     %m"
+        Domain = "CASNOFAULT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASNOFAULT:RECORD_KEY <> "NF" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ________________________________________       |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+|  Deductible: _____  Basic Pip: ______   Medical Expense Only: ______         |
+|              _____             ______                         ______         |
+|              _____             ______                         ______         |
+|              _____             ______                         ______         |
+|              _____             ______                         ______         |
+|              _____             ______                         ______         |
+| Extended Limit:  ________ Addl Limit: ________ Charge: ______ Per:  __       |
+| Pedestrian Charge: ______ Per:        __ Stranger Ped PIP: __                |
+| Tort Factor:       ______ Waiver Codes MD: _______  _______    Factor: _____ |
+| Secondary Option:  ______                                                    |
+| Broadened Code: _______  Basic Pip:  ______                                  |
+| Motor Bus Code: _______  Liability:  ______    Limit: ________ Factor:______ |
+| Liability Factor: ______                                                     |
+| Additional PIP Named Family Members: __                                      |
+| Additional PIP Code:                 _______                                 |
+| Medical Expense Limits                                                       |
+|         ________         _________   _________                               |
+|         ________         _________   _________                               |
+|         ________         _________   _________                               |
+|         ________         _________   _________                               |
+|         ________         _________   _________                               |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASNOFAULT:RECORD_KEY = "NF"
+            CASNOFAULT:FILLER = ""
+            CASNOFAULT:DESCRIPTION = ""
+            End
+        End
+        CASNOFAULT:COMPANY_ID                   Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASNOFAULT:STATE                        Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASNOFAULT:LINE_OF_BUSINESS             Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASNOFAULT:EFF_DATE                     Mandatory;
+801     CASNOFAULT:DEDUCTIBLE[1];
+802     CASNOFAULT:DEDUCTIBLE_BASIC_PIP[1];
+803     CASNOFAULT:DEDUCTIBLE_MEDICAL_EXPENSE[1];
+901     CASNOFAULT:DEDUCTIBLE[2];
+902     CASNOFAULT:DEDUCTIBLE_BASIC_PIP[2];
+903     CASNOFAULT:DEDUCTIBLE_MEDICAL_EXPENSE[2];
+1001    CASNOFAULT:DEDUCTIBLE[3];
+1002    CASNOFAULT:DEDUCTIBLE_BASIC_PIP[3];
+1003    CASNOFAULT:DEDUCTIBLE_MEDICAL_EXPENSE[3];
+1101    CASNOFAULT:DEDUCTIBLE[4];
+1102    CASNOFAULT:DEDUCTIBLE_BASIC_PIP[4];
+1103    CASNOFAULT:DEDUCTIBLE_MEDICAL_EXPENSE[4];
+1201    CASNOFAULT:DEDUCTIBLE[5];
+1202    CASNOFAULT:DEDUCTIBLE_BASIC_PIP[5];
+1203    CASNOFAULT:DEDUCTIBLE_MEDICAL_EXPENSE[5];
+1301    CASNOFAULT:DEDUCTIBLE[6];
+1302    CASNOFAULT:DEDUCTIBLE_BASIC_PIP[6];
+1303    CASNOFAULT:DEDUCTIBLE_MEDICAL_EXPENSE[6];
+1401    CASNOFAULT:EXTENDED_LIMIT;
+1402    CASNOFAULT:EXTENDED_ADDL_LIMIT;
+1403    CASNOFAULT:EXTENDED_CHARGE;
+1404    CASNOFAULT:EXTENDED_PER;
+1501    CASNOFAULT:PEDESTRIAN_CHARGE;
+1502    CASNOFAULT:PEDESTRIAN_PER;
+1503    casnofault:stranger_ped_pip ;
+1601    CASNOFAULT:TORT_FACTOR;
+1602    casnofault:waiver_code[1]/uppercase ;
+1603    casnofault:waiver_code[2]/uppercase ;
+1604    casnofault:waiver_factor ;
+1701    CASNOFAULT:SECONDARY_OPTION;
+1801    CASNOFAULT:BROADENED_CODE;
+1802    CASNOFAULT:BROADENED_BASIC_PIP;
+1901    CASNOFAULT:MOTOR_BUS_CODE;
+1902    CASNOFAULT:MOTOR_BUS_LIABILITY;
+1903    CASNOFAULT:MOTOR_BUS_MEDICAL_LIMIT;
+1904    CASNOFAULT:MOTOR_BUS_MEDICAL_FACTOR;
+2001    casnofault:liability_minimum_factor;
+2101    CASNOFAULT:ADDL_PIP_FAMILY_MEMBER;
+2201    CASNOFAULT:ADDL_PIP_CODE;
+2401    CASNOFAULT:MEDICAL_EXPENSE_LIMIT[1];
+2402    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[1];
+2403    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[6];
+2501    CASNOFAULT:MEDICAL_EXPENSE_LIMIT[2];
+2502    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[2];
+2503    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[7];
+2601    CASNOFAULT:MEDICAL_EXPENSE_LIMIT[3];
+2602    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[3];
+2603    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[8];
+2701    CASNOFAULT:MEDICAL_EXPENSE_LIMIT[4];
+2702    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[4];
+2703    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[9];
+2801    CASNOFAULT:MEDICAL_EXPENSE_LIMIT[5];
+2802    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[5];
+2803    CASNOFAULT:MEDICAL_EXPENSE_LIMIT_FACTOR[10];
+
+}
+
+End

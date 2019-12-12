@@ -1,0 +1,87 @@
+%%
+Screen
+        Name = "casmt067" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s No Fault Coverage (DE) - Ver. 7.00     %m" ;
+        Domain = "casnofaultmd" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If casnofaultmd:RECORD_KEY <> "MD" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State Code:           __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Basic Limits:           ________                                             |
+| Broadened Code:         _______   Charge: ______                             |
+| Individual Waiver Code: _______   Non-Individual Waiver Code: _______        |
+| Waiver factor:          ______                                               |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            casnofaultmd:RECORD_KEY = "MD"
+            casnofaultmd:FILLER = ""
+            End
+        End
+        casnofaultmd:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     casnofaultmd:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     casnofaultmd:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     casnofaultmd:EFF_DATE                   Mandatory;
+801     casnofaultmd:BASIC_LIMITS ;
+901     casnofaultmd:BROADENED_CODE;
+902     casnofaultmd:BROADENED_CHARGE;
+1001    casnofaultmd:individual_waiver_code/uppercase ;
+1002    casnofaultmd:non_individual_waiver_code/uppercase ;
+1101    casnofaultmd:waiver_factor ;
+
+}
+
+End

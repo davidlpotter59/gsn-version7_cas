@@ -1,0 +1,73 @@
+%%
+Screen
+        Name = "casmt038" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Vehicle Symbols - Ver. 7.00     %m" ;
+        domain = "casvehiclesymbol" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _________________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __     ___________________________________________________ |
+| Line Of Business: ____   ___________________________________________________ |
+| Vehicle Symbol:   _                                                          |
+*------------------------------------------------------------------------------*
+| Description:                                                                 |
+| ___________________________________________________________________________  |
+*------------------------------------------------------------------------------*
+| Allow Agent to View: _                                                       |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASVEHICLESYMBOL:COMPANY_ID             Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASVEHICLESYMBOL:STATE                  Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASVEHICLESYMBOL:LINE_OF_BUSINESS       Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASVEHICLESYMBOL:VEHICLE_SYMBOL         Mandatory;
+901     CASVEHICLESYMBOL:DESCRIPTION;
+1101    casvehiclesymbol:allow_agent_to_view/checkbox/values="0,1" ;
+
+}
+
+End

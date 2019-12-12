@@ -1,0 +1,1036 @@
+%%
+/*
+Date Written: October 22, 2001
+
+Name: casmca826.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+10/22/2001             DWR              Modified form for MSO
+                                        Italic & Bold Added
+12/03/2001             DWR              Data Added
+08/09/2002             RMG              Adding Code for Edition Date
+==============================================================
+*/
+
+Program
+  Name = "casmca826";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+   String L_FILE_NAME[12] = "casmca826.cq";
+   String L_COPY_NAME[20] ;
+   String L_FORM_PRINT[15] ;
+   String L_EDITION_PRINT[10] ;
+   String L_INFILE[15]="casmca826.in";
+   String L_READ_INFILE[25];
+   Unsigned Ascii Number L_TOTAL_VEHICLE_PER_PAGE = 54;
+   Unsigned Ascii Number L_FIRST_PAGE_TOTAL_VEHICLE = 12;
+   Unsigned Ascii Number L_TOTAL_VEHICLE;
+   Unsigned Ascii Number L_LINE_COUNTER;
+   Unsigned Ascii Number L_MAX_LINE = 55;
+   Unsigned Ascii Number L_PAGE_NUMER = 1;
+   Unsigned Ascii Number L_PRINTED_VEHICLE_ON_PAGE = 0;
+   Number L_PAGE_NUMBER = 1;
+   Unsigned Ascii Number L_SECOND_COLUMN_LOC;
+   String L_READ;
+
+   Include "swsut100.var"
+   Include "swsut200.var"
+   Include "swsut300.var"
+   Include "csfonts.inc"
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+
+--Access CAPBROADENED,
+--       Set CAPBROADENED:POLICY_NO    = SFPPRINT1:POLICY_NO,
+--           CAPBROADENED:POL_YEAR     = SFPPRINT1:POL_YEAR,
+--           CAPBROADENED:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPEND1,
+       Set SFPEND1:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPEND1:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPEND1:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access SFPMASTER,
+       Set SFPMASTER:POLICY_NO    = SFPPRINT1:POLICY_NO,
+          SFPMASTER:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPMASTER:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Include "swsut101.inc"
+I_CODE = "MCA826 "
+Include "swsut200.inc"
+Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%n%s",L_ARIAL_9,"<033>&a420h7000V",
+                      L_COPYRIGHT_6,L_ARIAL_9,"1996 MSO, Inc.",L_ARIAL_BOLD_9,
+                      "<033>&a5000h7000V","Page ",L_PAGE_NUMBER,"<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+Writefile(L_FILE_NAME,"%s",Trun(SFSOPTEND:FORM_PRINT))
+Writefile(L_FILE_NAME,"%s"," ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s",SFSOPTEND:EDITION_PRINT)
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER + 3
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "MEDICAL EXPENSE BENEFITS FOR BUS PASSENGERS - NEW JERSEY",
+                      "<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a90h+0V",
+                      "For a covered motor bus licensed or principally ",
+                      "garaged in New Jersey, this endorsement provides","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a90h+0V",
+                      "medical expense benefits for passengers in accordance ",
+                      "with New Jersey laws. The required","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a90h+0V",
+                      "information may be shown below or elsewhere in this ",
+                      "policy.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+30V",
+                      "The provisions of this endorsement apply only when the ",
+                      "endorsement number is listed in","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "the Declarations. Except as provided below, all other ",
+                      "provisions in this policy are unchanged.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")           --Horizontal line
+L_LINE_COUNTER =L_LINE_COUNTER +2
+
+Writefile(L_FILE_NAME,"%s%s%s%n%s%s",L_ARIAL_9,"<033>&a90h+0V","Policy # ",
+                      SFPPRINT1:POLICY_NO , "<NL>","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +2
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V","SCHEDULE",
+                      "<NL>","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +2
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a720h+0V",
+                      "Description of Vehicle","<033>&a4300h+0V","Premium",
+                      "<NL>","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +2
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "Vehicle # ","<033>&a600h+0V","Year",
+                      "<033>&a900h+0V","Make","<033>&a2700h+0V","Model",
+                      "<033>&a4300h+0V","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+While SFPEND1:POLICY_NO    = sfpprint1:POLICY_NO And
+       SFPEND1:POL_YEAR     = sfpprint1:POL_YEAR And
+       SFPEND1:END_SEQUENCE = sfpprint1:END_SEQUENCE
+  {
+    If SFPEND1:CODE = I_code Then
+      {    --check the number of vehicles printed and make sure that
+           --the form fields are inserted when needed
+        Access CAPVEHICLE,
+           Set CAPVEHICLE:POLICY_NO    = SFPend1:POLICY_NO,
+               CAPVEHICLE:POL_YEAR     = SFPend1:POL_YEAR,
+               CAPVEHICLE:END_SEQUENCE = SFPend1:END_SEQUENCE,
+               capvehicle:vehicle_no   = sfpend1:vehicle_no, exact
+
+        If ((L_PRINTED_VEHICLE_ON_PAGE = L_FIRST_PAGE_TOTAL_VEHICLE) And
+            (L_PAGE_NUMER = 1)) Or
+            ((L_PRINTED_VEHICLE_ON_PAGE = L_TOTAL_VEHICLE_PER_PAGE) And
+            (L_PAGE_NUMER > 1)) Then
+          {
+            Writefile(L_FILE_NAME,"%s","<FF>")
+            L_PAGE_NUMER = L_PAGE_NUMER + 1
+            L_PRINTED_VEHICLE_ON_PAGE = 0
+            L_LINE_COUNTER = 0
+          }
+
+        Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+        Writefile(L_FILE_NAME,"%s","<033>&a250h+0V")
+        Writefile(L_FILE_NAME,"%n",CAPVEHICLE:VEHICLE_NO)
+        Writefile(L_FILE_NAME,"%s","<033>&a600h+0V")
+        Writefile(L_FILE_NAME,"%n",CAPVEHICLE:YEAR)
+        Writefile(L_FILE_NAME,"%s","<033>&a900h+0V")
+        Writefile(L_FILE_NAME,"%s",CAPVEHICLE:MAKE)
+        Writefile(L_FILE_NAME,"%s","<033>&a2700h+0V")
+        Writefile(L_FILE_NAME,"%s",CAPVEHICLE:MODEL)
+        Writefile(L_FILE_NAME,"%s","<033>&a4300h+0V")
+        Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+        Writefile(L_FILE_NAME,"%s","$")
+        Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+        Writefile(L_FILE_NAME,"%s",Str(CAPVEHICLE:VEHICLE_TOTALS[13],"Z,ZZZ,ZZZ"))
+        Writefile(L_FILE_NAME,"%s","<NL>")
+        L_LINE_COUNTER = L_LINE_COUNTER +1
+        L_PRINTED_VEHICLE_ON_PAGE = L_PRINTED_VEHICLE_ON_PAGE + 1
+        L_TOTAL_VEHICLE = L_TOTAL_VEHICLE + 1
+       }
+    Next SFPEND1
+  }
+
+Writefile(L_FILE_NAME,"%s","<FF>")
+
+l_page_number = l_page_number + 1
+
+Writefile(L_FILE_NAME,"%s%s%s%n%s",L_ARIAL_BOLD_9,"<033>&a4200h7000V",
+                                  "MCA 826 01 97 - Page ",L_PAGE_NUMBER,
+                                  "<033>&a4500h7000V")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a90h200V<033>*c5800h5v0P",
+                      "<NL>",L_ARIAL_BOLD_14,"<033>&a1000h+60V",
+                      "MEDICAL EXPENSE BENEFITS FOR BUS PASSENGERS","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +3
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a90h-60V<033>*c5800h5v0P",
+                      "<NL>","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +2
+L_SECOND_COLUMN_LOC =L_LINE_COUNTER
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "A.","<033>&a250h+0V","COVERAGE")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h+0V",
+                      "2.",L_ARIAL_9,"<033>&a3200h+0V",
+                      "Arising out of the maintenance, ownership, or use,","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a250h+0V",
+                      "We ",L_ARIAL_9,"will pay medical expense benefits for ",
+                      L_ARIAL_ITALIC_9,"bodily injury")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "including loading or unloading, of any vehicle while",
+                      "<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a250h+0V",
+                      "sustained by an ",L_ARIAL_ITALIC_9,"eligible injured ",
+                      "passenger ",L_ARIAL_9,"caused by")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "located for use as a residence or premises, other","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a250h+0V",
+                      "an ",L_ARIAL_ITALIC_9,"accident ",
+                      L_ARIAL_9,"occurring during the policy period and")
+
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "than for transitory recreational purposes;","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a250h+0V",
+                      "arising out of the maintenance, ownership, or use of an",
+                      "<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_ITALIC_9,"<033>&a250h+0V",
+                      "insured motor bus.")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h-60V","3.",
+                      L_ARIAL_9,"<033>&a3200h+0V","Due to war, whether or not ",
+                      "declared, civil war,","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "insurrection, rebellion or revolution, or to any act",
+                      "<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+0V",
+                      "These medical expense benefits consist of:")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "or condition incident to any of the foregoing;","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "An amount not exceeding $250,000 per person per")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h+0V","4.",
+                      L_ARIAL_9,"<033>&a3200h+0V","Resulting from the ",
+                      "radioactive, toxic, explosive or","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a250h+0V",
+                      "accident ",L_ARIAL_9,"for reasonable expenses incurred ",
+                      "for medical,")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "other hazardous properties of nuclear material;","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a250h+0V",
+                      "surgical, chiropractic and dental treatment,","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+0V",
+                      "professional nursing, hospital and rehabilitation")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h-60V","5.",
+                      L_ARIAL_9,"<033>&a3200h+0V","To any person, if such ",
+                      "person is entitled to New","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "services, ambulance services, X-ray and other")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h-60V",
+                      "Jersey personal injury protection coverage under","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "diagnostic services, prosthetic devices, medication and")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h-60V",
+                      "the terms of any other coverage form or policy with","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "other reasonable and necessary expenses incurred for")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h-60V",
+                      "respect to such coverage.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "treatment prescribed by persons licensed to practice","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+0V",
+                      "medicine, surgery, psychology, or for any nonmedical")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a2800h-60V",
+                      "C.","<033>&a3000h+0V","LIMIT OF INSURANCE","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "remedial treatment rendered in accordance with a")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h-60V",
+                      "1.","<033>&a3200h+0V",L_ARIAL_9,
+                      "Any amount payable by ",L_ARIAL_ITALIC_9, "us ",L_ARIAL_9,
+                      "as medical expense","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "recognized religious method of healing; however, it")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3200h-60V",
+                      "benefits for ",L_ARIAL_ITALIC_9,"bodily injury ",L_ARIAL_9,
+                      "shall be reduced by:","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "does not include expense in excess of those for a")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3200h-60V",
+                      "a.","<033>&a3400h+0V",L_ARIAL_9,
+                      "All amounts paid, payable or required to be","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "semiprivate room, unless more intensive care is")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h-60V",
+                      "provided under any workers' compensation or","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a250h+60V",
+                      "medically required.")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h-60V",
+                      "employees' temporary disability law.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3200h+30V",
+                      "b.","<033>&a3400h+0V",L_ARIAL_9,
+                      "Medicare provided under federal law.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "B.","<033>&a250h+0V","EXCLUSIONS")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3200h+30V",
+                      "c.","<033>&a3400h+0V",L_ARIAL_9,
+                      "Benefits actually collected that are provided","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a250h-30V",
+                      "We ",L_ARIAL_9,"will not pay medical expense benefits for ",
+L_ARIAL_ITALIC_9,"bodily ")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+30V",
+                      "under federal law to active and retired military","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_ITALIC_9,"<033>&a250h-30V","injury:")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+30V","personnel.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a250h+0V",
+                      "1.",L_ARIAL_9,"<033>&a420h+0V",
+                      "To a person whose conduct contributed to the","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a420h+0V",
+                      "bodily injury ",L_ARIAL_9,"in any of the following ways:")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h-60V",
+                      "2.","<033>&a3200h+0V",L_ARIAL_9,
+                      "Any amount payable by ",L_ARIAL_ITALIC_9, "us ",L_ARIAL_9,
+                      "as medical expense","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h+60V",
+                      "a.",L_ARIAL_9,"<033>&a590h+0V",
+                      "While committing a high misdemeanor or a")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h-60V",
+                      "benefits will be limited by medical fee schedules,","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+60V",
+                      "felony or seeking to avoid lawful apprehension")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h-60V",
+                      "as promulgated by the New Jersey Department of","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+60V",
+                      "or arrest by a police officer; or")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h-60V",
+                      "Banking and Insurance, for specific injuries or","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V","services.","<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h+0V",
+                      "b.",L_ARIAL_9,"<033>&a590h+0V",
+                      "While acting with specific intent to cause","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "injury or damage to himself or herself or","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V","others;","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+If L_LINE_COUNTER > L_MAX_LINE Then
+  {
+    Writefile(L_FILE_NAME,"%s","<FF>")
+    L_LINE_COUNTER = 0  --reset it to zero for page 2
+  }
+
+                      --  PAGE 2 of MCA 826 01 97
+
+If L_LINE_COUNTER + 55 > L_MAX_LINE Then
+  {
+    Writefile(L_FILE_NAME,"%s","<FF>")
+  }
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a90h+0V",
+                      "D.","<033>&a250h+0V","CHANGES IN CONDITIONS")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3200h+0V",
+                      "c.","<033>&a3400h+0V",
+                      "Payment of Medical Expense Benefits","<NL>")
+                      L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a250h+0V",
+                      "1.",L_ARIAL_9,"<033>&a420h+0V",
+                      "The DUTIES OF ",L_ARIAL_ITALIC_9,"INSUREDS ",L_ARIAL_9,
+                      "- WHAT TO DO IN")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "Medical expense benefits may be paid at ",
+                      L_ARIAL_ITALIC_9,"our","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a420h+0V",
+                      "CASE OF ",L_ARIAL_ITALIC_9,"ACCIDENT, ",L_ARIAL_9,
+                      "CLAIM, INJURY, OR SUIT")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "option to the ",L_ARIAL_ITALIC_9,"eligible injured ",
+                      "passenger ",L_ARIAL_9,"or the","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a420h+0V",
+                      "Condition is amended by the addition of the")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "person or organization furnishing the products","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a420h+0V","following:")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "or services for which such benefits are due.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h+0V",
+                      "a.",L_ARIAL_9,"<033>&a590h+0V","If an ",L_ARIAL_ITALIC_9,
+                      "eligible injured passenger ",L_ARIAL_9,"(or his or her")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "These benefits shall not be assignable except","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "legal representative or survivors) institutes")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "to providers of service benefits. In the event","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "legal action to recover damages for injury")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "of the death of an ",L_ARIAL_ITALIC_9,"eligible ",
+                      "injured passenger","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "against a person or organization who is or may")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "any amounts payable, but unpaid prior to","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "be liable in tort therefor, he or she must")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "death, for medical expense benefits, are","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "immediately give ",L_ARIAL_ITALIC_9,"us ", L_ARIAL_9,
+                      "a copy of the summons")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "payable to the ",L_ARIAL_ITALIC_9,"eligible injured ",
+                      "passenger's","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "and complaint or other process served in")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V","estate.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "connection with the legal action.")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3200h+60V","d.",
+                      "<033>&a3400h+0V","Workers' Compensation Reimbursement",
+                      "<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h+0V",
+                      "b.",L_ARIAL_9,"<033>&a590h+0V","The ",L_ARIAL_ITALIC_9,
+                      "eligible injured passenger ",L_ARIAL_9,"or someone on")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "If the ",L_ARIAL_ITALIC_9,"eligible injured passenger ",
+                      L_ARIAL_9,"fails to apply","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "his or her behalf must, as ",L_ARIAL_ITALIC_9,"we ",
+                      L_ARIAL_9,"may reasonably")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "for workers' compensation benefits or","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "require, give ",L_ARIAL_ITALIC_9,"us ",L_ARIAL_9,
+                      "written proof of claim")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "employees' temporary disability benefits for","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V","including:")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "which that person is eligible, ",L_ARIAL_ITALIC_9,"we ",
+                      L_ARIAL_9,"may","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a590h+0V",
+                      "(1)",L_ARIAL_9,"<033>&a760h+0V",
+                      "Full particulars of the nature and extent of")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "immediately apply to the provider of these","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a760h+0V",
+                      "the injuries and treatment received and")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "benefits for reimbursement of any medical","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a760h+0V",
+                      "contemplated; and")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "expense benefits that ",L_ARIAL_ITALIC_9,"we ",
+                      L_ARIAL_9,"have paid.","<NL>")
+                      L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a590h+40V",
+                      "(2)",L_ARIAL_9,"<033>&a760h+0V",
+                      "Such other information that will help ",L_ARIAL_ITALIC_9,
+                      "us")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3200h+0V","e.",
+                      "<033>&a3400h+0V","Premium Recomputation","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a760h+0V",
+                      "determine the amount due and payable.")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "The premium for this coverage is based on","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "rates which have been reduced in accordance","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h-40V",
+                      "c.",L_ARIAL_9,"<033>&a590h+0V","The ",L_ARIAL_ITALIC_9,
+                      "eligible injured passenger ",L_ARIAL_9,"must submit to")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+40V",
+                      "with Section 18 of the New Jersey","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h-40V",
+                      "physical examination by physicians when and")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+40V",
+                      "Automobile Reparation Reform Act to reflect","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a590h-40V",
+                      "as often as ",L_ARIAL_ITALIC_9,"we ",L_ARIAL_9,
+                      "reasonably require and a copy")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+40V",
+                      "the limitation on the right to recover damages","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h-40V",
+                      "of the medical report will be forwarded to such")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+40V",
+                      "imposed by Section 8 of said Act. If a court","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a590h-40V",
+                      "eligible injured passenger ",L_ARIAL_9,"if requested.")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+40V",
+                      "of competent jurisdiction declares or enters a","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "judgment the effect of which is to render","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a250h+0V",
+                      "2.",L_ARIAL_9,"<033>&a420h+0V","The following ",
+                      "conditions are added:")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "Section 8 of the Act invalid or unenforceable","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h+0V",
+                      "a. ","<033>&a590h+0V","Reimbursement and Trust")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "in whole or in part, ",L_ARIAL_ITALIC_9,"we ",
+                      L_ARIAL_9,"shall have the right to","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "Subject to any applicable limitations set forth")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "recompute the premium payable for the policy","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "in the New Jersey Automobile Reparation")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "on the basis of revised rates which are subject","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "Reform Act, if ",L_ARIAL_ITALIC_9,"we ",L_ARIAL_9,
+                      "make any payment to any")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "to approval by the Commissioner of Banking","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a590h+0V",
+                      "eligible injured passenger ",L_ARIAL_9,"under this ",
+                      "coverage")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "and Insurance.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "and that person recovers from another party,","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "he or she shall hold the proceeds in trust for")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a2800h+0V","E.",
+                      "<033>&a3000h+0V","ADDITIONAL DEFINITIONS","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a590h+0V",
+                      "us ",L_ARIAL_9,"and pay ",L_ARIAL_ITALIC_9, "us ",
+                      L_ARIAL_9,"back the amount ", L_ARIAL_ITALIC_9,"we ",
+                      L_ARIAL_9,"have paid.")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3000h+0V",
+                      "The following are added to the COMMON GLOSSARY","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a590h+0V",
+                      "We ",L_ARIAL_9,"will have a lien against such payment, ",
+                      "and")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3000h+0V",
+                      "for Medical Expense Benefits Coverage for Bus","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "may give notice of the lien to the person or")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3000h+0V",
+                      "Passengers:","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "organization causing ",L_ARIAL_ITALIC_9,"bodily injury ",
+                      L_ARIAL_9,", his or her")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h+0V",
+                      "1.",L_ARIAL_ITALIC_9,"<033>&a3200h+0V","Eligible ",
+                      "injured passenger ",L_ARIAL_9,"means a person","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "agent or insurer or a court having jurisdiction")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a3200h+0V",
+                      "occupying ",L_ARIAL_9,"an ",L_ARIAL_ITALIC_9,
+                      "insured motor bus, ",L_ARIAL_9,"except","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "in the matter.")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "employees of the owner or operator of the ",
+                      L_ARIAL_ITALIC_9,"insured","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a3200h+0V",
+                      "motor bus ",L_ARIAL_9,"while they are on duty.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h-40V",
+                      "b. ","<033>&a590h+0V","Coordination and Non-Duplication",
+                      "<NL>")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "Regardless of the number of ",L_ARIAL_ITALIC_9,
+                      "insured motor")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h+0V",
+                      "2.",L_ARIAL_ITALIC_9,"<033>&a3200h+0V","Insured motor bus ",
+                      L_ARIAL_9,"means an omnibus, as defined","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a590h+0V",
+                      "buses ",L_ARIAL_9,"which are insured for New Jersey")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "in R.S.39:1-1, listed in the Schedule or","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "Medical Expense Benefits Coverage For Bus")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                     "Declarations, for which Liability Coverage under","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "Passengers, or the number of insurers or")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "this policy applies and for which a specific","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "policies providing such coverage, there shall")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "premium for Medical Expense Benefits Coverage","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "be no duplication of payment of medical")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "for Bus Passengers is charged.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "expense benefits and the aggregate","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "maximum amount payable under this and all")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s%s",L_ARIAL_9,"<033>&a3200h-40V","An ",
+                      L_ARIAL_ITALIC_9,"insured motor bus ",L_ARIAL_9,
+                      "does not include:","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_9,"<033>&a590h+40V",
+                      "applicable policies with respect to ",L_ARIAL_ITALIC_9,
+                      "bodily injury")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3200h+0V","a.",
+                      L_ARIAL_9,"<033>&a3400h+0V",
+                      "Vehicles engaged in the transportation of","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "to any one person as the result of any one")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "passengers for hire in the manner and form","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s",L_ARIAL_ITALIC_9,"<033>&a590h+0V",
+                      "accident ",L_ARIAL_9,"shall not exceed $250,000.")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "commonly called taxicab service unless such","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "service becomes or is held out to be regular","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3400h+0V",
+                      "service between stated termini;","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%n%s",L_ARIAL_BOLD_9,"<033>&a90h7000V",
+                      "MCA 826 01 97 - Page ",L_PAGE_NUMBER +1,"<FF>")
+L_PAGE_NUMBER = L_PAGE_NUMBER + 1
+
+          L_LINE_COUNTER = 0  --reset it to zero for page 3
+
+                      --  PAGE 3 of MCA 826 01 97
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h120V",
+                      "b.",L_ARIAL_9,"<033>&a590h+0V",
+                      "Hotel buses used exclusively for the")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h+0V",
+                      "e.",L_ARIAL_9,"<033>&a3200h+0V",
+                      "Autocabs, limousines or livery services as","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "transportation of hotel patrons to or from local")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "defined in R.S.48:16-13, unless such service","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "railroad or other common carrier stations")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "becomes or is held out to be regular service","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "including local airports;")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "between stated termini;","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h+60V",
+                      "c.",L_ARIAL_9,"<033>&a590h+0V",
+                      "Buses operated for the transportation of")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h+0V",
+                      "f.",L_ARIAL_9,"<033>&a3200h+0V",
+                      "Any vehicle used in a ridesharing","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "enrolled children and adults only when serving")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "arrangement, as defined by the New Jersey","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "as chaperons to or from a school, school")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "Ridesharing Act of 1981, P.L. 1981, c.413","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "connected activity, day camp, summer day")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h+0V",
+                      "(C.27:26-1 et. al.); or","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "camp, nursery school, child care center,","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "pre-school center or other similar places of")
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a3000h-60V",
+                      "g.",L_ARIAL_9,"<033>&a3200h+0V",
+                      "Any motor bus owned and operated by the","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s",L_ARIAL_9,"<033>&a590h+60V",
+                      "education, including School Vehicle Type I and")
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a3200h-60V",
+                      "New Jersey Transit Corporation.","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+60V",
+                      "School Vehicle Type II as defined in","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "R.S.39:1-1;","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s%s%s%s",L_ARIAL_BOLD_9,"<033>&a420h+60V",
+                      "d.",L_ARIAL_9,"<033>&a590h+0V",
+                      "Any autobus with a carrying capacity of not","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "more than 13 passengers operated under","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                       "municipal consent upon a route established","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "wholly within the limits of a single municipality","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "or with a carrying capacity of not more than","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "20 passengers operated under municipal","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "consent upon a route established wholly","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "within the limits of not more than four","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "contiguous municipalities within any county of","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "the fifth or sixth class, which route in either","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "case does not in whole or in part parallel upon","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "the same street the line of any street or","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s%s%s%s",L_ARIAL_9,"<033>&a590h+0V",
+                      "traction railway or any other autobus route;","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +1
+
+     Writefile(L_FILE_NAME,"%s%s%s%n%s",L_ARIAL_BOLD_9,"<033>&a4200h7000V",
+                                  "MCA 826 01 97 - Page ",L_PAGE_NUMBER +1,
+                                  "<033>&a4500h7000V")
+
+Screen Exit
+Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+Closefile(L_FILE_NAME)
+End

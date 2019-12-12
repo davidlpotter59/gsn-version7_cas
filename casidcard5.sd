@@ -1,0 +1,819 @@
+%% 
+/*
+Date Written: March 05, 2003
+
+Name: casidcard5.sd             LEBINIS ONLY AUTO ID CARD
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+05/22/2007             DWR        Converted this to a Lebanon Only ID Card
+===========================
+*/
+
+Program
+  Name = "casidcard5" ;
+  Type = "File" ;
+  Domain = "SFPPRINT1";
+  Padcharacter = Space ;
+
+  String L_FILE_NAME[13] = "casidcard5.cq" ;
+  String L_PRINTER[4];
+  String L_STATE[15];
+  String L_ALPHA_POLICY_NO = "";
+  String L_SFSAGENT_ZIP;
+  String L_PREV_STRING;
+  String L_TYPE_STR[29];
+  String L_TRANS_EFF;
+  String L_AUDIT="";
+  String L_SYMBOL_STRING[5] = "";
+  String L_COMPANY[10] = "";
+  String L_SFPNAME_ZIP = "";
+  String L_FOB[75];
+  String L_LOB_CODE[10];
+  string l_enter[1];
+  String L_COMPANY_ID[10];
+  String L_USER_ID[15];
+  String L_SIGNATURE_STRING[55];
+  String L_COMPANY_TEL[13];
+  String L_COMPANY_ZIP[10];
+
+  Number L_SWITCH_COL_COUNTER = 1;
+  Number L_AGENT_CODE_LINE;    --print line of the agent code line
+  Number L_INSURED__LINE;      --print line of the insured top line
+  Number L_RENEWAL[9];
+  Number L_MM_1;
+  Number L_DD_1;
+  Number L_YY_1;
+  Number L_CAL_VERTICAL_POS_1;  --get the starting location of the insured
+  Number L_CAL_VERTICAL_POS;    --location on the pol eff date heading line
+  Number L_TRANS_CODE;
+
+  Ascii Number L_LENGTH;
+  Ascii Number L_WIDTH;
+  Ascii Number L_HORZ_LOC;
+  Ascii Number L_VERT_LOC;
+  Ascii Number L_VERT_LOC2;
+
+  Unsigned Ascii Number L_PRINTER_NO[4]; --the actual printer number
+  Unsigned Ascii Number L_LINE_COUNTER = 1;  --line counter per page
+  Unsigned Ascii Number L_CAPVEHICLE_STATE[2];
+  Unsigned Ascii Number L_CAPVEHICLE_COUNTY[3];
+  Unsigned Ascii Number L_LINE_OF_BUSINESS[4];
+  Unsigned Ascii Number L_TOTAL_VEHICLE;
+  Unsigned Ascii Number L_CURRENT_VEHICLE;
+  Unsigned Ascii Number L_NO_VEHICLE[3];
+  Unsigned Ascii Number L_COUNTER[3];
+  Unsigned Ascii Number L_LOOP;
+  Unsigned Ascii Number L_state_var[3];
+  Unsigned Ascii Number L_LAST_VEH;
+  Unsigned Ascii Number L_LOOP_NUMBER;
+  Unsigned Ascii Number L_LOOP_2;
+  Unsigned Ascii Number L_LOOP1;
+  Unsigned Ascii Number L_LOOP3;
+  Unsigned ascii number l_individual_id_card;
+
+  Include "csfonts.inc"
+  Include "center2.var"
+  Include "sfsrevname.var"
+
+Initialisation
+  Deletefile(L_FILE_NAME);
+  L_PRINTER            = COMMANDLINE[1,4]
+  l_individual_id_card = val(COMMANDLINE[5,5])
+
+Update
+  Access SFPNAME,
+     Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Exact
+
+  Access SFSAGENT ,
+     Set SFSAGENT:COMPANY_ID = SFPNAME:COMPANY_ID,
+         SFSAGENT:AGENT_NO   = SFPNAME:AGENT_NO, Exact
+
+  Access SFSCOMPANY,
+     Set SFSCOMPANY:COMPANY_ID = SFPNAME:COMPANY_ID , Exact
+
+  Access SFSLINE,
+     Set SFSLINE:COMPANY_ID       = SFPNAME:COMPANY_ID ,
+         SFSLINE:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS, Generic
+
+  Access SFPMASTER,
+     Set SFPMASTER:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         SFPMASTER:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         SFPMASTER:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Exact
+
+  Access CASDEFAULT,
+     Set CASDEFAULT:COMPANY_ID       = SFPNAME:COMPANY_ID,
+         CASDEFAULT:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS, Exact
+
+  Access CAPVEHICLE,
+     Set CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+  Access CAPADDIN,
+     Set CAPADDIN:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPADDIN:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPADDIN:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,Generic
+
+  Access CAPADDLPIP,
+     Set CAPADDLPIP:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPADDLPIP:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPADDLPIP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,Generic
+
+  Access CAPNONOWNED,
+     Set CAPNONOWNED:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPNONOWNED:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPNONOWNED:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Exact
+
+  Access SFSAGENT,
+     Set SFSAGENT:COMPANY_ID = SFPNAME:COMPANY_ID,
+         SFSAGENT:AGENT_NO   = SFPNAME:AGENT_NO, Exact
+
+  Access CAPNONOWNED,
+     Set CAPNONOWNED:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPNONOWNED:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPNONOWNED:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Exact
+
+  L_LOB_CODE   = SFSLINE:LOB_CODE
+  L_COMPANY_ID = SFPNAME:COMPANY_ID
+
+  L_COMPANY     = SFPNAME:COMPANY_ID
+  L_COMPANY_TEL = SFSCOMPANY:TELEPHONE[1]
+
+  Access CAPVEHICLE,
+     Set CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,Generic
+
+  L_USER_ID    = USERNAME  -- getting current user name
+  L_PRINTER_NO = Val(L_PRINTER)   --converting l_printer to the number
+
+  L_CAPVEHICLE_STATE  = CAPVEHICLE:STATE
+  L_CAPVEHICLE_COUNTY = CAPVEHICLE:COUNTY
+
+  Access SCIPSCONTROL,
+             Set SCIPSCONTROL:COMPANY_ID = L_COMPANY_ID,
+                 SCIPSCONTROL:STATE      = L_CAPVEHICLE_STATE,
+                 SCIPSCONTROL:LOB_CODE   = L_LOB_CODE, Exact
+
+  Access SFSSTATE,
+     Set SFSSTATE:COMPANY_ID = L_COMPANY_ID,
+         SFSSTATE:STATE      = L_CAPVEHICLE_STATE,
+         SFSSTATE:COUNTY     = L_CAPVEHICLE_COUNTY, Exact
+
+  Access SFSPRINTER,
+     Set SFSPRINTER:COMPANY_ID = L_COMPANY_ID,
+         SFSPRINTER:USER_ID    = L_USER_ID,
+         SFSPRINTER:PRINTER_NO = L_PRINTER_NO, Exact
+
+  L_RENEWAL = SFPNAME:PREVIOUS_POLICY_NO
+
+  L_PREV_STRING = If (SFPNAME:PREVIOUS_POLICY_NO <> 0) Then
+                    Str(SFPNAME:PREVIOUS_POLICY_NO)
+                  Else
+                    Str(SFPNAME:POLICY_NO)
+
+  L_SFPNAME_ZIP = If (Val(SFPNAME:ZIPCODE_1_4) = 0) Then
+                    SFPNAME:ZIPCODE_5_9
+                  Else
+                    SFPNAME:ZIPCODE_5_9 + "-" + SFPNAME:ZIPCODE_1_4
+
+  L_SFSAGENT_ZIP = If (Val(SFSAGENT:ZIPCODE_1_4) = 0) Then
+                    SFSAGENT:ZIPCODE_5_9
+                  Else
+                    SFSAGENT:ZIPCODE_5_9 + "-" + SFSAGENT:ZIPCODE_1_4
+
+  L_COMPANY_ZIP =  If (Val(SFSCOMPANY:STR_ZIPCODE[6,9]) = 0) Then
+                      SFSCOMPANY:STR_ZIPCODE[1,5]
+                   Else
+                      SFSCOMPANY:STR_ZIPCODE[1,5] + "-" +
+                      SFSCOMPANY:STR_ZIPCODE[6,9]
+
+  Switch(SFPMASTER:FORM_OF_BUSINESS)
+    Case 'C' : L_FOB = "Corporation"
+    Case 'I' : L_FOB = "Individual"
+    Case 'J' : L_FOB = "Joint Venture"
+    Case 'O' : L_FOB = "Organization"
+    Case 'P' : L_FOB = "Partnership"
+    Case 'T' : L_FOB = SFPMASTER:FOB_DESCRIPTION
+  End
+
+  L_state_var=000
+
+  Access SFSSTATE_ALIAS,
+     Set SFSSTATE_ALIAS:COMPANY_ID = L_COMPANY_ID,
+         SFSSTATE_ALIAS:STATE      = L_CAPVEHICLE_STATE,
+         SFSSTATE_ALIAS:COUNTY     = L_state_var, Exact
+
+  L_STATE = SFSSTATE_ALIAS:DESCRIPTION
+
+--I need to set the tray for the commercial auto ID Card
+
+--Writefile(L_FILE_NAME,"%s","<033>E")   --RESET PRINTER
+
+Writefile(L_FILE_NAME,"%s%n%s","<033>&l",SFSPRINTER:TRAY2[4],"H")  --selects new tray to print from
+
+Writefile(L_FILE_NAME,"%s","<033>&l0E")    --sets the top margin to 0
+Writefile(L_FILE_NAME,"%s","<033>&l65F")   --sets the page length to 65 lines
+
+--If SCIPSCONTROL:CA_ID_CARD_PRINT_BOTH_SIDES = 1 Then --set duplex printing if both sides need to print
+--  {
+--    Writefile(L_FILE_NAME,"%s",L_LEDUP)
+--  }
+--Else
+--  {
+    Writefile(L_FILE_NAME,"%s","<033>&l0S")  --simplex mode
+--  }
+
+-- NEED TO LOOP THOUGH ALL VEHICLES
+-- reaccessing the file
+if l_individual_id_card = 1 then   --do not print individual id cards
+  {
+    do print_individual_id_cards    --prints indivicual id cards
+  }
+else
+  {
+    do print_id_cards    --prints id cards two per page
+  }
+
+Writefile(L_FILE_NAME,"%s%n%s","<033>&l",SFSPRINTER:TRAY2[1],"H")
+
+-- Default Paper Tray Selection
+
+Screen Exit
+  Writefile(L_FILE_NAME,"%s%s",L_FORMFEED,L_RESET)
+  Closefile(L_FILE_NAME)
+
+Procedure Definition
+
+procedure print_individual_id_cards
+
+BEGIN
+  L_COUNTER = 0
+  While CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+        CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR And
+        CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+    {
+      if capvehicle:print_copies > 0 then
+        {
+          for l_loop_number = 1 to capvehicle:print_copies
+            {  --run loop to the capvehicle:print_copies
+              l_counter = l_counter + 1
+                  L_CAPVEHICLE_STATE  = CAPVEHICLE:STATE
+                  L_CAPVEHICLE_COUNTY = CAPVEHICLE:COUNTY
+                  Access SCIPSCONTROL,
+                     Set SCIPSCONTROL:COMPANY_ID = L_COMPANY_ID,
+                         SCIPSCONTROL:STATE      = L_CAPVEHICLE_STATE,
+                         SCIPSCONTROL:LOB_CODE   = L_LOB_CODE, Exact
+
+                  If L_COUNTER mod 2 = 1 Then
+                    {
+                      L_VERT_LOC = 200
+                    }
+                  Else
+                    {
+                      L_VERT_LOC = 2800
+                    }
+
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_6)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s",SCIPSCONTROL:AUTO_CODE)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2590h+120V")
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+                  Writefile(L_FILE_NAME,"%s%s",trun(L_STATE)," FINANCIAL RESPONSIBILITY IDENTIFICATION CARD")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h+120V")
+                  Writefile(L_FILE_NAME,"%s",L_PUSH)
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+                  Writefile(L_FILE_NAME,"%s","NAIC NUMBER")
+                  Writefile(L_FILE_NAME,"%s",L_PUSH)
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2290h+100V")
+                  Writefile(L_FILE_NAME,"%s",SCIPSCONTROL:AUTO_COMPANY_CODE)
+                  Writefile(L_FILE_NAME,"%s",L_POP)
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2790h+60V")
+                  For L_LOOP = 1 To 3
+                    {
+                      If SFSCOMPANY:NAME[L_LOOP] <> "" Then
+                        {
+                          L_STRING         = SFSCOMPANY:NAME[L_LOOP]
+                          L_FONT           = L_ARIAL_BOLD_8
+                          L_PITCH_HALF     = 4
+                          L_PITCH_FULL     = 8
+                          L_VERTICAL_POS   = "-40"
+                          L_HORIZONTAL_POS = "4500"
+                          Include "center3.pro"
+                          Writefile(L_FILE_NAME,"%s","<NL>")
+                        }
+                    }
+                  For L_LOOP = 1 To 3
+                    {
+                      If SFSCOMPANY:ADDRESS[L_LOOP] <> "" Then
+                        {
+                          L_STRING         = SFSCOMPANY:ADDRESS[L_LOOP]
+                          L_FONT           = L_ARIAL_BOLD_8
+                          L_PITCH_HALF     = 4
+                          L_PITCH_FULL     = 8
+                          L_VERTICAL_POS   = "-40"
+                          L_HORIZONTAL_POS = "4500"
+                          Include "center3.pro"
+                          Writefile(L_FILE_NAME,"%s","<NL>")
+                        }
+                    }
+                  L_STRING         = Trun(SFSCOMPANY:CITY) + ", " + Trun(SFSCOMPANY:STR_STATE) + " " + L_COMPANY_ZIP
+                  L_FONT           = L_ARIAL_BOLD_7
+                  L_PITCH_HALF     = 4
+                  L_PITCH_FULL     = 8
+                  L_VERTICAL_POS   = "-40"
+                  L_HORIZONTAL_POS = "4500"
+                  Include "center3.pro"
+                  Writefile(L_FILE_NAME,"%s","<NL>")
+
+                  If SFSCOMPANY:TELEPHONE[1] <> "" Then
+                    {
+                      Writefile(L_FILE_NAME,"%s%s%s%s %s-%s%s","<033>&a4240h-40V",
+                                      "(",L_COMPANY_TEL[1,3],")",L_COMPANY_TEL[4,6],
+                                          L_COMPANY_TEL[7,10],"<NL>")
+                    }
+
+                  If L_COUNTER mod 2 = 1 Then
+                    {
+                      L_VERT_LOC = 960
+                    }
+                  Else
+                    {
+                      L_VERT_LOC = 3560
+                    }
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC-120)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s","INSURED")
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+                  Writefile(L_FILE_NAME,"%s","<033>&a200h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s",trun(SCIPSCONTROL:ID_CARD_PERFORATION_WORDING))
+
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+                  For L_LOOP = 1 To 3
+                    {
+                      If (SFPNAME:NAME[L_LOOP] <> "") Then
+                        {
+                          I_NAME = SFPNAME:NAME[L_LOOP]
+                          Include "sfsrevname.pro"
+                          Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                          Writefile(L_FILE_NAME,"%s",Trun(I_REV_NAME))
+                          Writefile(L_FILE_NAME,"%s","<NL>")
+                          L_LINE_COUNTER = L_LINE_COUNTER + 1
+                        }
+                    }
+
+                  For L_LOOP = 1 To 3
+                    {
+                      If SFPNAME:ADDRESS[L_LOOP] <> "" Then
+                        {
+                          Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                          Writefile(L_FILE_NAME,"%s",SFPNAME:ADDRESS[L_LOOP])
+                          Writefile(L_FILE_NAME,"%s","<NL>")
+                          L_LINE_COUNTER = L_LINE_COUNTER + 1
+                        }
+                    }
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                  Writefile(L_FILE_NAME,"%s",Trun(SFPNAME:CITY))
+                  Writefile(L_FILE_NAME,"%s",", ")
+                  Writefile(L_FILE_NAME,"%s",SFPNAME:STR_STATE)
+                  Writefile(L_FILE_NAME,"%s","  ")
+                  Writefile(L_FILE_NAME,"%s",L_SFPNAME_ZIP)
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+                  If L_COUNTER mod 2 = 1 Then
+                    {
+                      L_VERT_LOC = 1540           --first id card
+                    }
+                  Else
+                    {
+                      L_VERT_LOC = 4160          --second id card screen coordinate
+                    }
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s","POLICY NUMBER")
+                  Writefile(L_FILE_NAME,"%s","<033>&a3260h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s","EFFECTIVE DATE")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4550h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s","EXPIRATION DATE")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s",Trun(SFSLINE:ALPHA))
+                  Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+                  Writefile(L_FILE_NAME,"%s","<033>&a3260h-0V")
+                  Writefile(L_FILE_NAME,"%d",SFPNAME:EFF_DATE)
+                  Writefile(L_FILE_NAME,"%s","<033>&a4550h+0V")
+                  Writefile(L_FILE_NAME,"%d",SFPNAME:EXP_DATE)
+
+                  If L_COUNTER mod 2 = 1 Then
+                    {
+                      L_VERT_LOC = 1780           --first id card
+                    }
+                  Else
+                    {
+                      L_VERT_LOC = 4420          --second id card screen coordinate
+                    }
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s","YEAR")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2910h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s","MAKE/MODEL")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4080h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s","VEHICLE IDENTIFICATION NUMBER")
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%n",CAPVEHICLE:YEAR)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2910h+0V")
+                  Writefile(L_FILE_NAME,"%s",trun(CAPVEHICLE:MAKE))
+                  Writefile(L_FILE_NAME,"/%s",CAPVEHICLE:MODEL)
+                  Writefile(L_FILE_NAME,"%s","<033>&a4080h+0V")
+                  Writefile(L_FILE_NAME,"%s",CAPVEHICLE:SERIAL_NO)
+
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+
+                  If L_COUNTER mod 2 = 1 Then
+                    {
+                      L_VERT_LOC = 2080           --first id card
+                    }
+                  Else
+                    {
+                      L_VERT_LOC = 4700          --second id card screen coordinate
+                    }
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC-120)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s","AGENCY NAME AND ADDRESS")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+                  Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+                  Writefile(L_FILE_NAME,"%s","V")
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_7)
+                  For L_LOOP_2 = 1 To 3
+                    {
+                      If SFSAGENT:NAME[L_LOOP_2] <> "" Then
+                        {
+                          Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                          Writefile(L_FILE_NAME,"%s",SFSAGENT:NAME[L_LOOP_2])
+                          Writefile(L_FILE_NAME,"%s","<NL>")
+                          L_LINE_COUNTER = L_LINE_COUNTER + 1
+                        }
+                    }
+                  For L_LOOP_2 = 1 To 3
+                    {
+                      If SFSAGENT:ADDRESS[L_LOOP_2] <> "" Then
+                        {
+                          Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                          Writefile(L_FILE_NAME,"%s",SFSAGENT:ADDRESS[L_LOOP_2])
+                          Writefile(L_FILE_NAME,"%s","<NL>")
+                          L_LINE_COUNTER = L_LINE_COUNTER + 1
+                        }
+                    }
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                  Writefile(L_FILE_NAME,"%s",Trun(SFSAGENT:CITY))
+                  Writefile(L_FILE_NAME,"%s",", ")
+                  Writefile(L_FILE_NAME,"%s",SFSAGENT:STR_STATE)
+                  Writefile(L_FILE_NAME,"%s","  ")
+                  writefile(L_FILE_NAME,"%s",L_SFSAGENT_ZIP)
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+                  If L_COUNTER mod 2 = 1 Then
+                    {
+                      L_VERT_LOC = 2340           --first id card
+                    }
+                  Else
+                    {
+                      L_VERT_LOC = 4965          --second id card screen coordinate
+                    }
+
+                  Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+                  Writefile(L_FILE_NAME,"%s","<033>&a3100h+120V")
+                  Writefile(L_FILE_NAME,"%s","SEE IMPORTANT MESSAGE ON REVERSE SIDE")
+              if l_counter mod 2 = 0 then
+                {
+                  Writefile(L_FILE_NAME,"%s","<FF>")
+                }
+            }  --for l_loop
+         }  --if statement
+     Next CAPVEHICLE
+   }
+END
+
+
+procedure print_id_cards
+
+BEGIN
+  L_COUNTER = 0
+
+  While CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+        CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR And
+        CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+    {
+      l_counter = l_counter + 1
+      Next capvehicle
+    }
+
+  Access CAPVEHICLE,
+     Set CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,Generic
+
+  While CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+        CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR And
+        CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+    {
+      --for l_counter = 1 to 2
+      -- {
+          L_CAPVEHICLE_STATE  = CAPVEHICLE:STATE
+          L_CAPVEHICLE_COUNTY = CAPVEHICLE:COUNTY
+          Access SCIPSCONTROL,
+             Set SCIPSCONTROL:COMPANY_ID = L_COMPANY_ID,
+                 SCIPSCONTROL:STATE      = L_CAPVEHICLE_STATE,
+                 SCIPSCONTROL:LOB_CODE   = L_LOB_CODE, Exact
+
+          If L_COUNTER Mod 2 = 0 Then
+            {
+              L_VERT_LOC = 200
+            }
+          Else
+            {
+              L_VERT_LOC = 2800
+            }
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_6)
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s",SCIPSCONTROL:AUTO_CODE)
+          Writefile(L_FILE_NAME,"%s","<033>&a2490h+120V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s%s",trun(L_STATE)," FINANCIAL RESPONSIBILITY IDENTIFICATION CARD")
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h+120V")
+          Writefile(L_FILE_NAME,"%s",L_PUSH)
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+          Writefile(L_FILE_NAME,"%s","NAIC NUMBER")
+          Writefile(L_FILE_NAME,"%s",L_PUSH)
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+          Writefile(L_FILE_NAME,"%s","<033>&a2290h+100V")
+          Writefile(L_FILE_NAME,"%s",SCIPSCONTROL:AUTO_COMPANY_CODE)
+          Writefile(L_FILE_NAME,"%s",L_POP)
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a2790h+60V")
+          For L_LOOP = 1 To 3
+            {
+              If SFSCOMPANY:NAME[L_LOOP] <> "" Then
+                {
+                  L_STRING         = SFSCOMPANY:NAME[L_LOOP]
+                  L_FONT           = L_ARIAL_BOLD_8
+                  L_PITCH_HALF     = 4
+                  L_PITCH_FULL     = 8
+                  L_VERTICAL_POS   = "-40"
+                  L_HORIZONTAL_POS = "4500"
+                  Include "center3.pro"
+                  Writefile(L_FILE_NAME,"%s","<NL>")
+                }
+            }
+          For L_LOOP = 1 To 3
+            {
+              If SFSCOMPANY:ADDRESS[L_LOOP] <> "" Then
+                {
+                  L_STRING         = SFSCOMPANY:ADDRESS[L_LOOP]
+                  L_FONT           = L_ARIAL_BOLD_8
+                  L_PITCH_HALF     = 4
+                  L_PITCH_FULL     = 8
+                  L_VERTICAL_POS   = "-40"
+                  L_HORIZONTAL_POS = "4500"
+                  Include "center3.pro"
+                  Writefile(L_FILE_NAME,"%s","<NL>")
+                }
+            }
+          L_STRING         = Trun(SFSCOMPANY:CITY) + ", " + Trun(SFSCOMPANY:STR_STATE) + " " + L_COMPANY_ZIP
+          L_FONT           = L_ARIAL_BOLD_7
+          L_PITCH_HALF     = 4
+          L_PITCH_FULL     = 8
+          L_VERTICAL_POS   = "-40"
+          L_HORIZONTAL_POS = "4500"
+          Include "center3.pro"
+          Writefile(L_FILE_NAME,"%s","<NL>")
+
+          If SFSCOMPANY:TELEPHONE[1] <> "" Then
+            {
+              Writefile(L_FILE_NAME,"%s%s%s%s %s-%s%s","<033>&a4240h-40V",
+                               "(",L_COMPANY_TEL[1,3],")",L_COMPANY_TEL[4,6],
+                                   L_COMPANY_TEL[7,10],"<NL>")
+            }
+
+          If L_COUNTER Mod 2 = 0 Then
+            {
+              L_VERT_LOC = 960
+            }
+          Else
+            {
+              L_VERT_LOC = 3560
+            }
+
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC-120)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s","INSURED")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a200h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s",trun(SCIPSCONTROL:ID_CARD_PERFORATION_WORDING))
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+          For L_LOOP = 1 To 3
+            {
+              If (SFPNAME:NAME[L_LOOP] <> "") Then
+                {
+                  I_NAME = SFPNAME:NAME[L_LOOP]
+                  Include "sfsrevname.pro"
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                  Writefile(L_FILE_NAME,"%s",Trun(I_REV_NAME))
+                  Writefile(L_FILE_NAME,"%s","<NL>")
+                  L_LINE_COUNTER = L_LINE_COUNTER + 1
+                }
+            }
+
+          For L_LOOP = 1 To 3
+            {
+              If SFPNAME:ADDRESS[L_LOOP] <> "" Then
+                {
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                  Writefile(L_FILE_NAME,"%s",SFPNAME:ADDRESS[L_LOOP])
+                  Writefile(L_FILE_NAME,"%s","<NL>")
+                  L_LINE_COUNTER = L_LINE_COUNTER + 1
+                }
+            }
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+          Writefile(L_FILE_NAME,"%s",Trun(SFPNAME:CITY))
+          Writefile(L_FILE_NAME,"%s",", ")
+          Writefile(L_FILE_NAME,"%s",SFPNAME:STR_STATE)
+          Writefile(L_FILE_NAME,"%s","  ")
+          Writefile(L_FILE_NAME,"%s",L_SFPNAME_ZIP)
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+          If L_COUNTER Mod 2 = 0 Then
+            {
+              L_VERT_LOC = 1540           --first id card
+            }
+          Else
+            {
+              L_VERT_LOC = 4160          --second id card screen coordinate
+            }
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s","POLICY NUMBER")
+          Writefile(L_FILE_NAME,"%s","<033>&a3260h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s","EFFECTIVE DATE")
+          Writefile(L_FILE_NAME,"%s","<033>&a4550h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s","EXPIRATION DATE")
+          Writefile(L_FILE_NAME,"%s",l_arial_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s",Trun(SFSLINE:ALPHA))
+          Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+          Writefile(L_FILE_NAME,"%s","<033>&a3260h-0V")
+          Writefile(L_FILE_NAME,"%d",SFPNAME:EFF_DATE)
+          Writefile(L_FILE_NAME,"%s","<033>&a4550h+0V")
+          Writefile(L_FILE_NAME,"%d",SFPNAME:EXP_DATE)
+
+          If L_COUNTER Mod 2 = 0 Then
+            {
+              L_VERT_LOC = 1780           --first id card
+            }
+          Else
+            {
+              L_VERT_LOC = 4420          --second id card screen coordinate
+            }
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s","YEAR")
+          Writefile(L_FILE_NAME,"%s","<033>&a2910h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s","MAKE/MODEL")
+          Writefile(L_FILE_NAME,"%s","<033>&a4080h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC-100)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s","VEHICLE IDENTIFICATION NUMBER")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%n",CAPVEHICLE:YEAR)
+          Writefile(L_FILE_NAME,"%s","<033>&a2910h+0V")
+          Writefile(L_FILE_NAME,"%s",trun(CAPVEHICLE:MAKE))
+          Writefile(L_FILE_NAME,"/%s",CAPVEHICLE:MODEL)
+          Writefile(L_FILE_NAME,"%s","<033>&a4080h+0V")
+          Writefile(L_FILE_NAME,"%s",CAPVEHICLE:SERIAL_NO)
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+
+          If L_COUNTER Mod 2 = 0 Then
+            {
+              L_VERT_LOC = 2080           --first id card
+            }
+          Else
+            {
+              L_VERT_LOC = 4700          --second id card screen coordinate
+            }
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC-120)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s","AGENCY NAME AND ADDRESS")
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h")
+          Writefile(L_FILE_NAME,"%n",L_VERT_LOC)
+          Writefile(L_FILE_NAME,"%s","V")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_7)
+          For L_LOOP_2 = 1 To 3
+            {
+              If SFSAGENT:NAME[L_LOOP_2] <> "" Then
+                {
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                  Writefile(L_FILE_NAME,"%s",SFSAGENT:NAME[L_LOOP_2])
+                  Writefile(L_FILE_NAME,"%s","<NL>")
+                  L_LINE_COUNTER = L_LINE_COUNTER + 1
+                }
+            }
+          For L_LOOP_2 = 1 To 3
+            {
+              If SFSAGENT:ADDRESS[L_LOOP_2] <> "" Then
+                {
+                  Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+                  Writefile(L_FILE_NAME,"%s",SFSAGENT:ADDRESS[L_LOOP_2])
+                  Writefile(L_FILE_NAME,"%s","<NL>")
+                  L_LINE_COUNTER = L_LINE_COUNTER + 1
+                }
+            }
+          Writefile(L_FILE_NAME,"%s","<033>&a2150h-45V")
+          Writefile(L_FILE_NAME,"%s",Trun(SFSAGENT:CITY))
+          Writefile(L_FILE_NAME,"%s",", ")
+          Writefile(L_FILE_NAME,"%s",SFSAGENT:STR_STATE)
+          Writefile(L_FILE_NAME,"%s","  ")
+          writefile(L_FILE_NAME,"%s",L_SFSAGENT_ZIP)
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+
+          If L_COUNTER Mod 2 = 0 Then
+            {
+              L_VERT_LOC = 2340           --first id card
+            }
+          Else
+            {
+              L_VERT_LOC = 4965          --second id card screen coordinate
+            }
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_8)
+
+          Writefile(L_FILE_NAME,"%s","<033>&a3100h+120V")
+          Writefile(L_FILE_NAME,"%s","SEE IMPORTANT MESSAGE ON REVERSE SIDE")
+        if l_counter mod 2 = 1 then
+          {
+            Writefile(L_FILE_NAME,"%s","<FF>")
+          }
+        l_counter = l_counter - 1
+      Next CAPVEHICLE
+    }
+}
+
+End

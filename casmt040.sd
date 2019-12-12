@@ -1,0 +1,83 @@
+%%
+Screen
+        Name = "casmt040" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Mobile Equipment Coverage - Ver. 7.00     %m" ;
+        Domain = "casmobileequipment" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If casmobileequipment:RECORD_KEY <> "ME" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State:                __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Comp Factor:          _____                                                  |
+| Coll Factor:          _____                                                  |
+| Code:                 _______                                                |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            casmobileequipment:RECORD_KEY = "ME"
+            casmobileequipment:FILLER = ""
+            End
+        End
+        casmobileequipment:COMPANY_ID                   Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     casmobileequipment:STATE                        Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     casmobileequipment:LINE_OF_BUSINESS             Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     casmobileequipment:EFF_DATE                     Mandatory;
+801     casmobileequipment:comp_factor;
+901     casmobileequipment:coll_factor;
+1001    casmobileequipment:Code/uppercase;
+
+}
+
+End

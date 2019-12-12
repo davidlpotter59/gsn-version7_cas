@@ -1,0 +1,102 @@
+%%
+Screen
+        Name = "casmt002" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Medical Payments Premiums - Ver. 7.00    %m" ;
+        Domain = "CASMEDPAY" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASMEDPAY:RECORD_KEY <> "MP" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  _____________________________________________  |
+| State:            __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Type:             _     ___________________________________________________  |
+| Territory Code:   ___                                                        |
+| No Fault:         _                                                          |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Limit:   __________   __________   __________   __________   __________      |
+| Charge:  ____         ____         ____         ____         ____            |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASMEDPAY:RECORD_KEY = "MP"
+            CASMEDPAY:FILLER = ""
+            CASMEDPAY:DESCRIPTION = ""
+            End
+        End
+        CASMEDPAY:COMPANY_ID                    Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASMEDPAY:STATE                         Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASMEDPAY:LINE_OF_BUSINESS              Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASMEDPAY:TYPE                          Mandatory
+        If CASMEDPAY:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASMEDPAY:TERRITORY                     Mandatory;
+801     CASMEDPAY:NO_FAULT                      Mandatory;
+901     CASMEDPAY:EFF_DATE                      Mandatory;
+1101    CASMEDPAY:LIMIT[1];
+1201    CASMEDPAY:CHARGE[1];
+1102    CASMEDPAY:LIMIT[2];
+1202    CASMEDPAY:CHARGE[2];
+1103    CASMEDPAY:LIMIT[3];
+1203    CASMEDPAY:CHARGE[3];
+1104    CASMEDPAY:LIMIT[4];
+1204    CASMEDPAY:CHARGE[4];
+1105    CASMEDPAY:LIMIT[5];
+1205    CASMEDPAY:CHARGE[5];
+
+}
+
+End

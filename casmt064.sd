@@ -1,0 +1,73 @@
+%%
+Screen
+        Name = "casmt064" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Hired Deductibles - Ver 7.00     %m" ;
+        domain="casautoded" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _____________
+*------------------------------------------------------------------------------*
+| Company Id:        __________  _____________________________________________ |
+| State Code:        __          _____________________________________________ |
+| Line Of Business:  ____        _____________________________________________ |
+| Comp:              _                                                         |
+| Hired/Nonowned:    _                                                         |
+| Deductible:        _____                                                     |
+*------------------------------------------------------------------------------*
+| Description:       __________________________________________________        |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASAUTODED:COMPANY_ID                   Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1];
+401     CASAUTODED:STATE                        Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASAUTODED:LINE_OF_BUSINESS             Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASAUTODED:COMP_COLL                    Mandatory;
+701     CASAUTODED:HIRED_NONOWNED               Mandatory;
+801     CASAUTODED:DEDUCTIBLE                   Mandatory;
+1001    CASAUTODED:DESCRIPTION;
+
+}
+
+End

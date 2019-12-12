@@ -1,0 +1,501 @@
+%%
+/*
+Date Written: April 24, 2002
+
+Name: casdrivers.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+06/05/2002             RMG              Starting Form
+05/30/2007             DWR          Added Lebanon Specific Code
+===========================
+*/
+
+Program
+  Name = "casdrivers";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+ String L_FILE_NAME[13] = "casdrivers.cq";
+ String L_COPY_NAME[20] ;
+ string l_font[35] ;
+ String I_REV_NAME2[50] ;
+ String L_INSURED_CITY_STATE[50];
+ String L_SFPNAME_ZIP="";
+ String L_SFSAGENT;
+ String L_SFPLOCATION_ZIP;
+ String L_AGENT_ADDRESS;
+ String L_AGENT_TEL[13];
+ String L_AGENT_ZIP[10];
+ String L_COMPANY_ID[10];
+ String L_LOB_CODE[10];
+ String L_COMPANY_ZIP[10];
+
+ Unsigned Ascii Number L_DECIPOINT;
+ Unsigned Ascii Number L_CHARACTER_PER_INCH;
+ Unsigned Ascii Number L_LEN_STRING;
+ Unsigned Ascii Number L_PAGE_MIDDLE;
+ Unsigned Ascii Number L_HALF_MULTIPLIER;
+ Unsigned Ascii Number L_CHAR_MULTIPLIER[10]/decimals=4;
+ String L_USER_ID[15];
+ Unsigned Ascii Number L_PRINTER_NO[4]; --the actual printer number
+ Unsigned Ascii Number L_PAGE_NUMBER = 1;
+ Unsigned Ascii Number L_ITEM_COUNTER;
+ Unsigned Ascii Number L_S_LINE_FOR_AGENT = 0; --start line for agent
+ Unsigned Ascii Number L_S_LINE_FOR_LOCATION = 0; --start line for location
+ Unsigned Ascii Number L_E_LINE_FOR_INSURED = 0;
+ Unsigned Ascii Number L_PAGENUMBER;
+ Unsigned Ascii Number L_MAX_LINES;
+ Unsigned Ascii Number L_LINE_COUNTER;
+ Unsigned Ascii Number L_LOCATION_COUNTER;
+ Unsigned Ascii Number L_SIZE_COUNTER;
+ Unsigned Ascii Number L_INSURED_COUNTER;
+ Unsigned Ascii Number L_AGENT_COUNTER;
+ Unsigned Ascii Number L_TWO_PLACER;
+ Unsigned Ascii Number L_LINE_HEIGHT;
+ Unsigned Ascii Number L_STATE_NO[2];
+ String L_STATE_STR[2];
+ string L_POLICY_DECLARATION[150];
+ Unsigned Ascii Number L_LOOP;
+
+ Include "header.var"
+ Include "csfonts.inc"
+ Include "sfsrevname7.var"
+
+Initialization
+Deletefile (L_FILE_NAME)
+L_PRINTER_no = val(COMMANDLINE[1,4])
+
+Update
+
+Access SFPNAME,
+   Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Access SFPMASTER,
+   Set SFPMASTER:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       SFPMASTER:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       SFPMASTER:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Access CAPDRIVER,
+   Set CAPDRIVER:POLICY_NO = SFPPRINT1:POLICY_NO,
+       CAPDRIVER:POL_YEAR  = SFPPRINT1:POL_YEAR,
+       CAPDRIVER:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+Access CAPVEHICLE,
+   Set CAPVEHICLE:POLICY_NO = SFPPRINT1:POLICY_NO,
+       CAPVEHICLE:POL_YEAR  = SFPPRINT1:POL_YEAR,
+       CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic;
+
+L_COMPANY_ID = SFPNAME:COMPANY_ID/raw
+L_STATE_NO = CAPVEHICLE:STATE
+
+Access SFSCOMPANY,
+   Set SFSCOMPANY:COMPANY_ID = L_COMPANY_ID, Exact;
+
+Access SFSLINE,
+   Set SFSLINE:COMPANY_ID       = L_COMPANY_ID,
+       SFSLINE:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS,
+       SFSLINE:LOB_SUBLINE      = "00", Generic;
+
+L_LOB_CODE = SFSLINE:LOB_CODE
+
+Access SFSAGENT,
+   Set SFSAGENT:COMPANY_ID = SFPNAME:COMPANY_ID,
+       SFSAGENT:AGENT_NO   =  SFPNAME:AGENT_NO, Exact;
+
+Access SCIPSCONTROL,
+   Set SCIPSCONTROL:COMPANY_ID          = L_COMPANY_ID,
+       SCIPSCONTROL:STATE               = L_STATE_NO,
+       SCIPSCONTROL:LOB_CODE            = L_LOB_CODE, Exact
+
+Access SCIPSCONTROL1,
+   Set SCIPSCONTROL1:COMPANY_ID          = L_COMPANY_ID,
+       SCIPSCONTROL1:STATE               = L_STATE_NO,
+       SCIPSCONTROL1:LOB_CODE            = L_LOB_CODE, Exact
+
+L_USER_ID    = USERNAME  -- getting current user name
+
+Access SFSPRINTER,
+   Set SFSPRINTER:COMPANY_ID = L_COMPANY_ID,
+       SFSPRINTER:USER_ID    = L_USER_ID,
+       SFSPRINTER:PRINTER_NO = L_PRINTER_NO, Exact
+
+L_AGENT_TEL = SFSAGENT:TELEPHONE[1];
+
+L_SFSAGENT = If (Val(SFSAGENT:ZIPCODE_1_4) = 0) Then
+                      SFSAGENT:ZIPCODE_5_9
+                    Else
+                      SFSAGENT:ZIPCODE_5_9 + "-" + SFSAGENT:ZIPCODE_1_4
+
+L_SFPNAME_ZIP = If (Val(SFPNAME:STR_ZIPCODE[6,9]) = 0) Then
+                        SFPNAME:STR_ZIPCODE[1,5]
+                        Else
+                        SFPNAME:STR_ZIPCODE[1,5] + "-" +
+                        SFPNAME:STR_ZIPCODE[6,9]
+
+L_INSURED_CITY_STATE = Trun(SFPNAME:CITY) + ", " + SFPNAME:STR_STATE + "  " + L_SFPNAME_ZIP
+
+L_AGENT_ZIP =  If (Val(SFSAGENT:STR_ZIPCODE[6,9]) = 0) Then
+                  SFSAGENT:STR_ZIPCODE[1,5]
+                  Else
+                  SFSAGENT:STR_ZIPCODE[1,5] + "-" +
+                  SFSAGENT:STR_ZIPCODE[6,9]
+
+L_COMPANY_ZIP =  If (Val(SFSCOMPANY:STR_ZIPCODE[6,9]) = 0) Then
+                       SFSCOMPANY:STR_ZIPCODE[1,5]
+                     Else
+                       SFSCOMPANY:STR_ZIPCODE[1,5] + "-" +
+                       SFSCOMPANY:STR_ZIPCODE[6,9]
+
+L_COMPANY_ID = SFPNAME:COMPANY_ID
+
+L_AGENT_ADDRESS = SFSAGENT:CITY + ", " + SFSAGENT:STR_STATE
+
+L_LINE_HEIGHT = 250
+L_MAX_LINES = 57
+L_SIZE_COUNTER = 0
+L_LINE_COUNTER = 1
+L_PAGENUMBER = 1
+L_LOCATION_COUNTER = 1
+L_INSURED_COUNTER = 0
+L_AGENT_COUNTER = 0
+L_STATE_STR = SFSCOMPANY:STR_STATE
+
+if l_company_id = "NWIC" then
+  {
+
+    Writefile(L_FILE_NAME,"%s%n%s","<033>&l",SFSPRINTER:TRAY2[1],"H")
+  }
+
+Writefile(L_FILE_NAME,"%s",L_LEDUP)
+
+Include "header.inc"
+
+Writefile(L_FILE_NAME,"%s","<033>&a140h+0V<033>*c5455h20v0P")
+Writefile(L_FILE_NAME,"%s%s","<NL>","<NL>")
+L_LINE_HEIGHT = L_LINE_HEIGHT + 240
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL)
+Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+Writefile(L_FILE_NAME,"%s","Policy Number:")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+Writefile(L_FILE_NAME,"%s","<033>&a900h+0V")
+Writefile(L_FILE_NAME,"%s%n",Trun(SFSLINE:ALPHA),SFPPRINT1:POLICY_NO)
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+Writefile(L_FILE_NAME,"%s","<033>&a2300h+0V")
+Writefile(L_FILE_NAME,"%s","Inception Date: ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL)
+If sfpname:company_id = "FARMERS" then
+  {
+    Writefile(L_FILE_NAME,"%s",Str(SFPname:EFF_date,"mm/dd/yyy"))
+  }
+else
+  {
+    Writefile(L_FILE_NAME,"%s",Str(SFPMASTER:TRANS_EFF,"mm/dd/yyy"))
+  }
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+Writefile(L_FILE_NAME,"%s","<033>&a4000h+0V")
+Writefile(L_FILE_NAME,"%s","Expiration Date: ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL)
+If sfpname:company_id = "FARMERS" then
+  {
+    Writefile(L_FILE_NAME,"%s",Str(SFPname:Exp_date,"mm/dd/yyy"))
+  }
+else
+  {
+    Writefile(L_FILE_NAME,"%s",Str(SFPMASTER:TRANS_EXP,"mm/dd/yyy"))
+  }
+Writefile(L_FILE_NAME,"%s%s","<NL>","<NL>")
+L_LINE_HEIGHT = L_LINE_HEIGHT + 240
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+Writefile(L_FILE_NAME,"%s","INSURED AND MAILING ADDRESS:")
+Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+If SCIPSCONTROL:AGENT_PRINT_COPY_NAME <> "" then
+  {
+    Writefile(L_FILE_NAME,"%s",trun(SCIPSCONTROL:AGENT_PRINT_COPY_NAME))
+    Writefile(L_FILE_NAME,"%s"," NAME AND ADDRESS:")
+  }
+Else
+  {
+    Writefile(L_FILE_NAME,"%s","AGENT NAME AND ADDRESS:")
+  }
+--Writefile(L_FILE_NAME,"%s","<033>&a3400h+0V")
+--Writefile(L_FILE_NAME,"%n",SFSAGENT:AGENT_NO)
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s","<033>&f0S")
+
+L_LINE_COUNTER = (L_LINE_HEIGHT Div 120) + 2
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_8)
+
+I_NAME=SFPNAME:NAME[1,1,50]
+Include "sfsrevname7.pro"
+If SFPNAME:NAME[1] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+    Writefile(L_FILE_NAME,"%s",I_REV_NAME)
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_INSURED_COUNTER = L_INSURED_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+I_NAME=SFPNAME:NAME[2,1,50]
+Include "sfsrevname7.pro"
+If SFPNAME:NAME[2] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+    Writefile(L_FILE_NAME,"%s",I_REV_NAME)
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_INSURED_COUNTER = L_INSURED_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+I_NAME=SFPNAME:NAME[3,1,50]
+Include "sfsrevname7.pro"
+If SFPNAME:NAME[3] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+    Writefile(L_FILE_NAME,"%s",I_REV_NAME)
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_INSURED_COUNTER = L_INSURED_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+
+If (SFPNAME:ADDRESS[1,1,50] <> "") Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+    Writefile(L_FILE_NAME,"%s",SFPNAME:ADDRESS[1])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_INSURED_COUNTER = L_INSURED_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+If (SFPNAME:ADDRESS[2,1,50] <> "") Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+    Writefile(L_FILE_NAME,"%s",SFPNAME:ADDRESS[2])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_INSURED_COUNTER = L_INSURED_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+If (SFPNAME:ADDRESS[3,1,50] <> "") Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+    Writefile(L_FILE_NAME,"%s",SFPNAME:ADDRESS[3])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_INSURED_COUNTER = L_INSURED_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+Writefile(L_FILE_NAME,"%s",L_INSURED_CITY_STATE)
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_INSURED_COUNTER = L_INSURED_COUNTER +1
+L_LINE_COUNTER= L_LINE_COUNTER + 1
+
+Writefile(L_FILE_NAME,"%s","<033>&f1S")
+Writefile(L_FILE_NAME,"%s","<033>&f0S")
+
+Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+Writefile(L_FILE_NAME,"%s",SFSAGENT:NAME[1])
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_AGENT_COUNTER = L_AGENT_COUNTER +1
+L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+If SFSAGENT:NAME[2] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+    Writefile(L_FILE_NAME,"%s",SFSAGENT:NAME[2])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_AGENT_COUNTER = L_AGENT_COUNTER + 1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+If SFSAGENT:NAME[3] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+    Writefile(L_FILE_NAME,"%s",SFSAGENT:NAME[3])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_AGENT_COUNTER = L_AGENT_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+If SFSAGENT:ADDRESS[1] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+    Writefile(L_FILE_NAME,"%s",SFSAGENT:ADDRESS[1])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_AGENT_COUNTER = L_AGENT_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+If SFSAGENT:ADDRESS[2] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+    Writefile(L_FILE_NAME,"%s",SFSAGENT:ADDRESS[2])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_AGENT_COUNTER = L_AGENT_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+If SFSAGENT:ADDRESS[3] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+    Writefile(L_FILE_NAME,"%s",SFSAGENT:ADDRESS[3])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_AGENT_COUNTER = L_AGENT_COUNTER +1
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+  }
+Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+Writefile(L_FILE_NAME,"%s%s%s%s%s",Trun(SFSAGENT:CITY),", ",SFSAGENT:STR_STATE,
+          " ",L_AGENT_ZIP)
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_AGENT_COUNTER = L_AGENT_COUNTER +1
+L_LINE_COUNTER= L_LINE_COUNTER + 1
+
+If SFSAGENT:TELEPHONE[1] <> "" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+    Writefile(L_FILE_NAME,"%s%s%s%s%s%s","(",L_AGENT_TEL[1,3],") ",
+              L_AGENT_TEL[4,6],"-",L_AGENT_TEL[7,10])
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_AGENT_COUNTER = L_AGENT_COUNTER +1
+    L_LINE_COUNTER= L_LINE_COUNTER + 1
+  }
+If L_INSURED_COUNTER > L_AGENT_COUNTER Then
+  {
+    L_TWO_PLACER = L_LINE_COUNTER - L_AGENT_COUNTER
+  }
+Else
+  {
+    L_TWO_PLACER = L_LINE_COUNTER - L_INSURED_COUNTER
+  }
+
+L_LINE_COUNTER = L_TWO_PLACER  -- to ensure line counter is at correct location
+
+If L_AGENT_COUNTER > L_INSURED_COUNTER Then
+  {
+    L_TWO_PLACER = L_AGENT_COUNTER * 120 + 120
+  }
+Else
+  {
+    L_TWO_PLACER = L_INSURED_COUNTER * 120 + 120
+  }
+
+Writefile(L_FILE_NAME,"%s","<033>&f1S")
+
+Writefile(L_FILE_NAME,"%s%n%s","<033>&a140h+",L_TWO_PLACER,"V")
+Writefile(L_FILE_NAME,"%s","<033>*c5455h20v0P")
+Writefile(L_FILE_NAME,"%s","<NL>") --under name horizontal line to
+L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+Writefile(L_FILE_NAME,"%s","DRIVERS")
+Writefile(L_FILE_NAME,"%s","<033>&a2900h+0V")
+Writefile(L_FILE_NAME,"%s","DRIVERS")
+Writefile(L_FILE_NAME,"%s","<033>&a3700h+0V")
+Writefile(L_FILE_NAME,"%s","DRIVERS")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+Writefile(L_FILE_NAME,"%s","NAME:")
+Writefile(L_FILE_NAME,"%s","<033>&a2900h+0V")
+Writefile(L_FILE_NAME,"%s","D.O.B.")
+Writefile(L_FILE_NAME,"%s","<033>&a3700h+0V")
+Writefile(L_FILE_NAME,"%s","LICENSE #:")
+Writefile(L_FILE_NAME,"%s","<033>&a4700h+0V")
+Writefile(L_FILE_NAME,"%s","STATE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+Writefile(L_FILE_NAME,"%s","<033>&a140h-60V<033>*c5455h20v0P")
+Writefile(L_FILE_NAME,"%s%s","<NL>","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER + 2
+
+L_LOOP = 1
+
+While CAPDRIVER:POLICY_NO    = capvehicle:POLICY_NO And
+      CAPDRIVER:POL_YEAR     = capvehicle:POL_YEAR And
+      CAPDRIVER:END_SEQUENCE = capvehicle:END_SEQUENCE
+{
+  If CAPDRIVER:NAME <> "" then  ---and
+--     capdriver:named_driver_exclusion = 0 Then
+    {
+      If L_LINE_COUNTER >= L_MAX_LINES -5 Then
+        {
+          L_PAGE_NUMBER = L_PAGE_NUMBER +1
+          L_LINE_COUNTER = 1
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a4500h+240V")
+          Writefile(L_FILE_NAME,"%s","Continued on back.")
+
+          Writefile(L_FILE_NAME,"%s","<FF>")
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+          Writefile(L_FILE_NAME,"%s","<033>&a5000h7250V")
+          Writefile(L_FILE_NAME,"%s%n","Page ",L_PAGE_NUMBER)
+
+          Writefile(L_FILE_NAME,"%s","<033>&a+0h250V")
+          Writefile(L_FILE_NAME,"%s","<NL>") --sets starting point for newpage
+
+          Writefile(L_FILE_NAME,"%s","<033>&a140h-60V<033>*c5455h20v0P")
+          Writefile(L_FILE_NAME,"%s","<NL>")
+          L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+          Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+          Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+          Writefile(L_FILE_NAME,"%s","DRIVERS")
+          Writefile(L_FILE_NAME,"%s","<033>&a2900h+0V")
+          Writefile(L_FILE_NAME,"%s","DRIVERS")
+          Writefile(L_FILE_NAME,"%s","<033>&a3700h+0V")
+          Writefile(L_FILE_NAME,"%s","DRIVERS")
+          Writefile(L_FILE_NAME,"%s","<NL>")
+          L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+          Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+          Writefile(L_FILE_NAME,"%s","NAME:")
+          Writefile(L_FILE_NAME,"%s","<033>&a2900h+0V")
+          Writefile(L_FILE_NAME,"%s","D.O.B.")
+          Writefile(L_FILE_NAME,"%s","<033>&a3700h+0V")
+          Writefile(L_FILE_NAME,"%s","LICENSE #:")
+          Writefile(L_FILE_NAME,"%s","<033>&a4700h+0V")
+          Writefile(L_FILE_NAME,"%s","STATE")
+          Writefile(L_FILE_NAME,"%s","<NL>")
+          L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+          Writefile(L_FILE_NAME,"%s","<033>&a140h-60V<033>*c5455h20v0P")
+          Writefile(L_FILE_NAME,"%s%s","<NL>","<NL>")
+          L_LINE_COUNTER = L_LINE_COUNTER + 2
+
+        }
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD)
+      Writefile(L_FILE_NAME,"%s","<033>&a140h+0V")
+      Writefile(L_FILE_NAME,"%n",L_LOOP)
+      Writefile(L_FILE_NAME,"%s",L_ARIAL)
+      Writefile(L_FILE_NAME,"%s","<033>&a360h+0V")
+      Writefile(L_FILE_NAME,"%s",CAPDRIVER:NAME)
+      Writefile(L_FILE_NAME,"%s","<033>&a2900h+0V")
+      Writefile(L_FILE_NAME,"%s",Str(CAPDRIVER:BIRTH_DATE,"mm/dd/yyyy"))
+      Writefile(L_FILE_NAME,"%s","<033>&a3700h+0V")
+      Writefile(L_FILE_NAME,"%s",CAPDRIVER:LICENSE_NO)
+      Writefile(L_FILE_NAME,"%s","<033>&a4790h+0V")
+      Writefile(L_FILE_NAME,"%s",CAPDRIVER:STR_STATE)
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      L_LINE_COUNTER = L_LINE_COUNTER + 1
+      L_LOOP = L_LOOP + 1
+    }
+  Next CAPDRIVER
+}
+Writefile(L_FILE_NAME,"%s",trun(L_ARIAL_BOLD))
+Writefile(L_FILE_NAME,"%s","<033>&a200h7200V")
+Writefile(L_FILE_NAME,"%s",trun(SCIPSCONTROL1:PRINT_POLICY_FORM_ON_ALL_DECS))
+Writefile(L_FILE_NAME,"%s","<FF>")
+
+
+Screen Exit
+  Writefile(L_FILE_NAME,"%s%s",L_FORMFEED ,L_RESET )
+  Closefile(L_FILE_NAME)
+End

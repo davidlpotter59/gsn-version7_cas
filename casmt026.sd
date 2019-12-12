@@ -1,0 +1,91 @@
+%%
+Screen
+        Name = "casmt026" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s No Fault Additional PIP (NJ) - Ver. 7.00     %m" ;
+        Domain = "CASADDLPIP" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASADDLPIP:RECORD_KEY <> "AP" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ________________________________________       |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Option:           __                                                         |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| First Auto:       ____                                                       |
+| Each Addl Auto:   ____                                                       |
+| Weekly:           ____                  Per Day:   ___                       |
+| Aggregate:        ______                Aggregate: ______                    |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASADDLPIP:RECORD_KEY = "AP"
+            CASADDLPIP:FILLER = ""
+            CASADDLPIP:DESCRIPTION = ""
+            End
+        End
+        CASADDLPIP:COMPANY_ID                   Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASADDLPIP:STATE                        Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASADDLPIP:LINE_OF_BUSINESS             Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASADDLPIP:OPTION                       Mandatory;
+701     CASADDLPIP:EFF_DATE                     Mandatory;
+901     CASADDLPIP:FIRST_AUTO;
+1001    CASADDLPIP:EACH_ADDL_AUTO;
+1101    CASADDLPIP:INCOME_WEEKLY;
+1201    CASADDLPIP:INCOME_AGGREGATE;
+1102    CASADDLPIP:ESSENTIAL_PER_DAY;
+1202    CASADDLPIP:ESSENTIAL_AGGREGATE;
+
+}
+
+End

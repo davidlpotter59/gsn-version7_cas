@@ -1,0 +1,69 @@
+%%
+Screen
+        Name = "casmt034" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s PIP Deductibles - Ver. 7.00     %m" ;
+        Domain = "CASPIPDEDUCT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State:            __    _______________                                      |
+| Line Of Business: ____  ________________________________________             |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Deductible:       _____                                                      |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASPIPDEDUCT:COMPANY_ID                Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASPIPDEDUCT:STATE                     Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASPIPDEDUCT:LINE_OF_BUSINESS          Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASPIPDEDUCT:EFF_DATE                  Mandatory;
+801     CASPIPDEDUCT:DEDUCTIBLE;
+
+}
+
+End

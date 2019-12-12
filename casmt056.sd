@@ -1,0 +1,75 @@
+%%
+Screen
+        Name = "casmt056" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Garagekeepers Class Codes - Ver 7.00     %m" ;
+        domain="casgaragecodes" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*---------------------------------------------------------------------------------*
+| Company Id:       __________  ________________________________________________  |
+| State Code:       __          ________________________________________________  |
+| Line Of Business: ____        ________________________________________________  |
+| Class Code:       _____                                                         |
+| Effective Date:   __________                                                    |
+| Expiration Date:  __________                                                    |
+*---------------------------------------------------------------------------------*
+| Description:                                                                    |
+| _______________________________________________________________________________ |
+*---------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASGARAGECODES:COMPANY_ID               Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASGARAGECODES:STATE                    Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASGARAGECODES:LINE_OF_BUSINESS         Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASGARAGECODES:CLASS_CODE               Mandatory;
+701     CASGARAGECODES:EFF_DATE                 Mandatory;
+801     CASGARAGECODES:EXP_DATE;
+1101    CASGARAGECODES:DESCRIPTION;
+
+}
+
+End

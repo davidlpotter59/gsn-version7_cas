@@ -1,0 +1,147 @@
+%%
+Screen
+        Name = "casmt028" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s No Fault Coverage (DE) - Ver. 7.00     %m" ;
+        Domain = "CASNOFAULTDE" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASNOFAULTDE:RECORD_KEY <> "DE" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State Code:           __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Basic Limits:         ________  ________                                     |
+|                                Named Insured        Named Insured & Family   |
+| Deductible:           _____        ______                 ______             |
+|                       _____        ______                 ______             |
+|                       _____        ______                 ______             |
+|                       _____        ______                 ______             |
+|                       _____        ______                 ______             |
+| Addl PIP Code:        _______                                                |
+|                   Split                                           Single     |
+| Limit: ________/________ ______ _____         Limit: ________ ______ _____   |
+|        ________/________ ______ _____                ________ ______ _____   |
+|        ________/________ ______ _____                ________ ______ _____   |
+|        ________/________ ______ _____                ________ ______ _____   |
+|                                                      ________ ______ _____   |
+| Broadened Code:       _______        Charge: ______                          |
+| Damage Limit:         ______                                                 |
+| Waiver Factor:        _____                                                  |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASNOFAULTDE:RECORD_KEY = "DE"
+            CASNOFAULTDE:FILLER = ""
+            End
+        End
+        CASNOFAULTDE:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASNOFAULTDE:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASNOFAULTDE:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASNOFAULTDE:EFF_DATE                   Mandatory;
+801     CASNOFAULTDE:BASIC_LIMITS[1];
+802     CASNOFAULTDE:BASIC_LIMITS[2];
+1001    CASNOFAULTDE:DEDUCTIBLE[1];
+1002    CASNOFAULTDE:DEDUCTIBLE_FACTOR[1];
+1003    CASNOFAULTDE:DEDUCTIBLE_FACTOR[6];
+1101    CASNOFAULTDE:DEDUCTIBLE[2];
+1102    CASNOFAULTDE:DEDUCTIBLE_FACTOR[2];
+1103    CASNOFAULTDE:DEDUCTIBLE_FACTOR[7];
+1201    CASNOFAULTDE:DEDUCTIBLE[3] ;
+1202    CASNOFAULTDE:DEDUCTIBLE_FACTOR[3] ;
+1203    CASNOFAULTDE:DEDUCTIBLE_FACTOR[8];
+1301    CASNOFAULTDE:DEDUCTIBLE[4] ;
+1302    CASNOFAULTDE:DEDUCTIBLE_FACTOR[4] ;
+1303    CASNOFAULTDE:DEDUCTIBLE_FACTOR[9];
+1401    CASNOFAULTDE:DEDUCTIBLE[5] ;
+1402    CASNOFAULTDE:DEDUCTIBLE_FACTOR[5] ;
+1403    CASNOFAULTDE:DEDUCTIBLE_FACTOR[10];
+1501    CASNOFAULTDE:ADDL_PIP_CODE;
+1701    CASNOFAULTDE:SPLIT_LIMIT_1[1];
+1702    CASNOFAULTDE:SPLIT_LIMIT_2[1];
+1703    CASNOFAULTDE:SPLIT_PP_CHARGE[1];
+1704    CASNOFAULTDE:SPLIT_OTHER_FACTOR[1];
+1705    CASNOFAULTDE:SINGLE_LIMIT[1];
+1706    CASNOFAULTDE:SINGLE_PP_CHARGE[1];
+1707    CASNOFAULTDE:SINGLE_OTHER_FACTOR[1];
+1801    CASNOFAULTDE:SPLIT_LIMIT_1[2];
+1802    CASNOFAULTDE:SPLIT_LIMIT_2[2];
+1803    CASNOFAULTDE:SPLIT_PP_CHARGE[2];
+1804    CASNOFAULTDE:SPLIT_OTHER_FACTOR[2];
+1805    CASNOFAULTDE:SINGLE_LIMIT[2];
+1806    CASNOFAULTDE:SINGLE_PP_CHARGE[2];
+1807    CASNOFAULTDE:SINGLE_OTHER_FACTOR[2];
+1901    CASNOFAULTDE:SPLIT_LIMIT_1[3];
+1902    CASNOFAULTDE:SPLIT_LIMIT_2[3];
+1903    CASNOFAULTDE:SPLIT_PP_CHARGE[3];
+1904    CASNOFAULTDE:SPLIT_OTHER_FACTOR[3];
+1905    CASNOFAULTDE:SINGLE_LIMIT[3];
+1906    CASNOFAULTDE:SINGLE_PP_CHARGE[3];
+1907    CASNOFAULTDE:SINGLE_OTHER_FACTOR[3];
+2001    CASNOFAULTDE:SPLIT_LIMIT_1[4];
+2002    CASNOFAULTDE:SPLIT_LIMIT_2[4];
+2003    CASNOFAULTDE:SPLIT_PP_CHARGE[4];
+2004    CASNOFAULTDE:SPLIT_OTHER_FACTOR[4];
+2005    CASNOFAULTDE:SINGLE_LIMIT[4];
+2006    CASNOFAULTDE:SINGLE_PP_CHARGE[4];
+2007    CASNOFAULTDE:SINGLE_OTHER_FACTOR[4];
+2101    CASNOFAULTDE:SINGLE_LIMIT[5];
+2102    CASNOFAULTDE:SINGLE_PP_CHARGE[5];
+2103    CASNOFAULTDE:SINGLE_OTHER_FACTOR[5];
+2201    CASNOFAULTDE:BROADENED_CODE;
+2202    CASNOFAULTDE:BROADENED_CHARGE;
+2301    CASNOFAULTDE:DAMAGE_LIMIT;
+2401    casnofaultde:waiver_factor ;
+
+}
+
+End

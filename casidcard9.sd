@@ -1,0 +1,1053 @@
+%% 
+/*
+Date Written: August 29, 201
+
+Name: casidcard9.sd             Knightbrook ONLY Ohio Auto ID Card
+
+Copyright (c) 2012, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+08/29/2012             JLB        copied KBIC PA ID Card and created Ohio ID Card
+===========================
+*/
+
+Program
+  Name = "casidcard9" ;
+  Type = "File" ;
+  Domain = "SFPPRINT1";
+  Padcharacter = Space ;
+
+  String L_FILE_NAME[13] = "casidcard9.cq" ;
+  String L_PRINTER[4];
+  String L_STATE[15];
+  String L_ALPHA_POLICY_NO = "";
+  String L_SFSAGENT_ZIP;
+  String L_AGENT_ZIP;
+  String L_INSURED_CITY_STATE[100];
+
+  String L_PREV_STRING;
+  String L_TYPE_STR[29];
+  String L_TRANS_EFF;
+  String L_AUDIT="";
+  String L_SYMBOL_STRING[5] = "";
+  String L_COMPANY[10] = "";
+  String L_SFPNAME_ZIP = "";
+  String L_FOB[75];
+  String L_LOB_CODE[10];
+  string l_enter[1];
+  String L_COMPANY_ID[10];
+  String L_USER_ID[15];
+  String L_SIGNATURE_STRING[55];
+  String L_COMPANY_TEL[13];
+  String L_COMPANY_ZIP[10];
+  String L_AGENT_TEL[13];
+
+  Number L_SWITCH_COL_COUNTER = 1;
+  Number L_AGENT_CODE_LINE;    --print line of the agent code line
+  Number L_INSURED__LINE;      --print line of the insured top line
+  Number L_RENEWAL[9];
+  Number L_MM_1;
+  Number L_DD_1;
+  Number L_YY_1;
+  Number L_CAL_VERTICAL_POS_1;  --get the starting location of the insured
+  Number L_CAL_VERTICAL_POS;    --location on the pol eff date heading line
+  Number L_TRANS_CODE;
+
+  Ascii Number L_LENGTH;
+  Ascii Number L_WIDTH;
+  Ascii Number L_HORZ_LOC;
+  Ascii Number L_VERT_LOC;
+  Ascii Number L_VERT_LOC2;
+
+  Unsigned Ascii Number L_PRINTER_NO[4]; --the actual printer number
+  Unsigned Ascii Number L_LINE_COUNTER = 1;  --line counter per page
+  Unsigned Ascii Number L_CAPVEHICLE_STATE[2];
+  Unsigned Ascii Number L_CAPVEHICLE_COUNTY[3];
+  Unsigned Ascii Number L_LINE_OF_BUSINESS[4];
+  Unsigned Ascii Number L_TOTAL_VEHICLE;
+  Unsigned Ascii Number L_CURRENT_VEHICLE;
+  Unsigned Ascii Number L_NO_VEHICLE[3];
+  Unsigned Ascii Number L_COUNTER[3]=0;
+  Unsigned Ascii Number L_LOOP;
+  Unsigned Ascii Number L_state_var[3];
+  Unsigned Ascii Number L_LAST_VEH;
+  Unsigned Ascii Number L_LOOP_NUMBER;
+  Unsigned Ascii Number L_LOOP_2;
+  Unsigned Ascii Number L_LOOP1;
+  Unsigned Ascii Number L_LOOP3;
+  Unsigned ascii number l_individual_id_card[1],
+                        l_vehicle_count[1];
+
+  Include "csfonts.inc"
+  Include "center2.var"
+  Include "sfsrevname.var"
+
+Initialisation
+  Deletefile(L_FILE_NAME);
+  L_PRINTER            = COMMANDLINE[1,4]
+  l_individual_id_card = val(COMMANDLINE[5,5])
+
+Update
+  Access SFPNAME,
+     Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Exact
+
+  Access SFSAGENT ,
+     Set SFSAGENT:COMPANY_ID = SFPNAME:COMPANY_ID,
+         SFSAGENT:AGENT_NO   = SFPNAME:AGENT_NO, Exact
+
+  Access SFSCOMPANY,
+     Set SFSCOMPANY:COMPANY_ID = SFPNAME:COMPANY_ID , Exact
+
+  Access SFSLINE,
+     Set SFSLINE:COMPANY_ID       = SFPNAME:COMPANY_ID ,
+         SFSLINE:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS, Generic
+
+  Access SFPMASTER,
+     Set SFPMASTER:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         SFPMASTER:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         SFPMASTER:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Exact
+
+  Access CASDEFAULT,
+     Set CASDEFAULT:COMPANY_ID       = SFPNAME:COMPANY_ID,
+         CASDEFAULT:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS, Exact
+
+  Access CAPVEHICLE,
+     Set CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+  Access CAPADDIN,
+     Set CAPADDIN:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPADDIN:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPADDIN:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,Generic
+
+  Access CAPADDLPIP,
+     Set CAPADDLPIP:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPADDLPIP:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPADDLPIP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,Generic
+
+  Access CAPNONOWNED,
+     Set CAPNONOWNED:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPNONOWNED:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPNONOWNED:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Exact
+
+  Access SFSAGENT,
+     Set SFSAGENT:COMPANY_ID = SFPNAME:COMPANY_ID,
+         SFSAGENT:AGENT_NO   = SFPNAME:AGENT_NO, Exact
+
+  Access CAPNONOWNED,
+     Set CAPNONOWNED:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPNONOWNED:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPNONOWNED:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Exact
+
+  L_LOB_CODE   = SFSLINE:LOB_CODE
+  L_COMPANY_ID = SFPNAME:COMPANY_ID
+
+  L_COMPANY     = SFPNAME:COMPANY_ID
+  L_COMPANY_TEL = SFSCOMPANY:TELEPHONE[1]
+
+  Access CAPVEHICLE,
+     Set CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,Generic
+
+  L_USER_ID    = USERNAME  -- getting current user name
+  L_PRINTER_NO = Val(L_PRINTER)   --converting l_printer to the number
+
+  L_CAPVEHICLE_STATE  = CAPVEHICLE:STATE
+  L_CAPVEHICLE_COUNTY = CAPVEHICLE:COUNTY
+
+  L_SFPNAME_ZIP = If (Val(SFPNAME:ZIPCODE_1_4) = 0) Then
+                          SFPNAME:ZIPCODE_5_9
+                  Else
+                          SFPNAME:ZIPCODE_5_9 + "-" + SFPNAME:ZIPCODE_1_4
+
+  L_AGENT_ZIP =  If (Val(SFSAGENT:STR_ZIPCODE[6,9]) = 0) Then
+                         SFSAGENT:STR_ZIPCODE[1,5]
+                 Else
+                         SFSAGENT:STR_ZIPCODE[1,5] + "-" + SFSAGENT:STR_ZIPCODE[6,9]
+
+  L_INSURED_CITY_STATE = Trun(SFPNAME:CITY) + ", " + SFPNAME:STR_STATE +
+                         "  " + L_SFPNAME_ZIP
+
+  Access SCIPSCONTROL,
+     Set SCIPSCONTROL:COMPANY_ID = L_COMPANY_ID,
+         SCIPSCONTROL:STATE      = L_CAPVEHICLE_STATE,
+         SCIPSCONTROL:LOB_CODE   = L_LOB_CODE, Exact
+
+  Access SFSSTATE,
+     Set SFSSTATE:COMPANY_ID = L_COMPANY_ID,
+         SFSSTATE:STATE      = L_CAPVEHICLE_STATE,
+         SFSSTATE:COUNTY     = L_CAPVEHICLE_COUNTY, Exact
+
+  Access SFSPRINTER,
+     Set SFSPRINTER:COMPANY_ID = L_COMPANY_ID,
+         SFSPRINTER:USER_ID    = L_USER_ID,
+         SFSPRINTER:PRINTER_NO = L_PRINTER_NO, Exact
+
+  L_RENEWAL = SFPNAME:PREVIOUS_POLICY_NO
+
+  L_PREV_STRING = If (SFPNAME:PREVIOUS_POLICY_NO <> 0) Then
+                    Str(SFPNAME:PREVIOUS_POLICY_NO)
+                  Else
+                    Str(SFPNAME:POLICY_NO)
+
+  L_SFPNAME_ZIP = If (Val(SFPNAME:ZIPCODE_1_4) = 0) Then
+                    SFPNAME:ZIPCODE_5_9
+                  Else
+                    SFPNAME:ZIPCODE_5_9 + "-" + SFPNAME:ZIPCODE_1_4
+
+  L_SFSAGENT_ZIP = If (Val(SFSAGENT:ZIPCODE_1_4) = 0) Then
+                    SFSAGENT:ZIPCODE_5_9
+                  Else
+                    SFSAGENT:ZIPCODE_5_9 + "-" + SFSAGENT:ZIPCODE_1_4
+
+  L_COMPANY_ZIP =  If (Val(SFSCOMPANY:STR_ZIPCODE[6,9]) = 0) Then
+                      SFSCOMPANY:STR_ZIPCODE[1,5]
+                   Else
+                      SFSCOMPANY:STR_ZIPCODE[1,5] + "-" +
+                      SFSCOMPANY:STR_ZIPCODE[6,9]
+
+  Switch(SFPMASTER:FORM_OF_BUSINESS)
+    Case 'C' : L_FOB = "Corporation"
+    Case 'I' : L_FOB = "Individual"
+    Case 'J' : L_FOB = "Joint Venture"
+    Case 'O' : L_FOB = "Organization"
+    Case 'P' : L_FOB = "Partnership"
+    Case 'T' : L_FOB = SFPMASTER:FOB_DESCRIPTION
+  End
+
+  L_state_var=000
+
+  Access SFSSTATE_ALIAS,
+     Set SFSSTATE_ALIAS:COMPANY_ID = L_COMPANY_ID,
+         SFSSTATE_ALIAS:STATE      = L_CAPVEHICLE_STATE,
+         SFSSTATE_ALIAS:COUNTY     = L_state_var, Exact
+
+  L_STATE = SFSSTATE_ALIAS:DESCRIPTION
+  L_AGENT_TEL          = SFSAGENT:TELEPHONE[1];
+--I need to set the tray for the commercial auto ID Card
+
+--Writefile(L_FILE_NAME,"%s","<033>E")   --RESET PRINTER
+
+Access SFSPRINTER,
+   Set SFSPRINTER:COMPANY_ID = L_COMPANY_ID,
+       SFSPRINTER:USER_ID    = L_USER_ID,
+       SFSPRINTER:PRINTER_NO = L_PRINTER_NO, Exact
+
+Writefile(L_FILE_NAME,"%s%n%s","<033>&l",SFSPRINTER:TRAY2[4],"H")  --selects new tray to print from
+
+--Writefile(L_FILE_NAME,"%s","<033>&l1O")
+--Writefile(L_FILE_NAME,"%s","<033>&l0E")    --sets the top margin to 0
+--Writefile(L_FILE_NAME,"%s","<033>&l65F")   --sets the page length to 65 lines
+
+Writefile(L_FILE_NAME,"%s",l_landscape)
+
+if l_individual_id_card = 1 then   -- print individual id cards
+  {
+    do print_individual_id_cards    --prints indivicual id cards
+  }
+else
+  {
+    do print_id_cards    --prints id cards two per page
+  }
+
+--Writefile(L_FILE_NAME,"%s%n%s","<033>&l",SFSPRINTER:TRAY2[1],"H")
+
+-- Default Paper Tray Selection
+
+Screen Exit
+  Writefile(L_FILE_NAME,"%s%s",L_FORMFEED,L_RESET)
+  Closefile(L_FILE_NAME)
+
+Procedure Definition
+
+procedure print_individual_id_cards
+
+BEGIN
+
+--L_COUNTER = 0
+  While CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+        CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR And
+        CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+    {
+      if capvehicle:print_copies > 0 then
+        {
+          for l_loop_number = 1 to capvehicle:print_copies
+            {  --run loop to the capvehicle:print_copies
+                  L_CAPVEHICLE_STATE  = CAPVEHICLE:STATE
+                  L_CAPVEHICLE_COUNTY = CAPVEHICLE:COUNTY
+                  Access SCIPSCONTROL,
+                     Set SCIPSCONTROL:COMPANY_ID = L_COMPANY_ID,
+                         SCIPSCONTROL:STATE      = L_CAPVEHICLE_STATE,
+                         SCIPSCONTROL:LOB_CODE   = L_LOB_CODE, Exact
+
+---column one start
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h120V")
+
+                  Writefile(L_FILE_NAME,"%s",L_PUSH)
+                  L_STRING = "Ohio Motor Vehicle Liability Insurance"
+                  L_FONT = L_ARIAL_bold_9
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+0"
+                  L_HORIZONTAL_POS = "2200"
+                  Include "center3.pro"
+
+                  L_STRING = "Identification Card"
+                  L_FONT = L_ARIAL_bold_9
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+120"
+                  L_HORIZONTAL_POS = "2200"
+                  Include "center3.pro"
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+240V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","COMPANY NUMBER")
+                  Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","COMPANY")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                  Writefile(L_FILE_NAME,"%s",trun(SCIPSCONTROL:AUTO_COMPANY_CODE))
+                  Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V")
+                  Writefile(L_FILE_NAME,"%s",trun(l_arial_bold_7))
+                  Writefile(L_FILE_NAME,"%s",SFSCOMPANY:NAME[1])
+
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+170V")
+                  Writefile(L_FILE_NAME,"%s","POLICY NUMBER")
+                  Writefile(L_FILE_NAME,"%s","<033>&a1750h+0V")
+                  Writefile(L_FILE_NAME,"%s","EFFECTIVE DATE")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2850h+0V")
+                  Writefile(L_FILE_NAME,"%s","EXPIRATION DATE")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                  Writefile(L_FILE_NAME,"%s",trun(l_arial_bold_7))
+                  Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+                  Writefile(L_FILE_NAME,"%s","<033>&a1750h+0V")
+                  Writefile(L_FILE_NAME,"%d",SFPNAME:EFF_DATE)
+                  Writefile(L_FILE_NAME,"%s"," 12:01 AM")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2850h+0V")
+                  Writefile(L_FILE_NAME,"%d",SFPNAME:EXP_DATE)
+                  Writefile(L_FILE_NAME,"%s"," 12:01 AM")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+200V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","YEAR")
+                  Writefile(L_FILE_NAME,"%s","<033>&a1350h+0V")
+                  Writefile(L_FILE_NAME,"%s","MAKE/MODEL")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2350h+0V")
+                  Writefile(L_FILE_NAME,"%s","VEHICLE IDENTIFICATION NUMBER")
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                  Writefile(L_FILE_NAME,"%s",trun(l_arial_bold_7))
+                  Writefile(L_FILE_NAME,"%n",CAPVEHICLE:YEAR)
+                  Writefile(L_FILE_NAME,"%s","<033>&a1350h+0V")
+                  Writefile(L_FILE_NAME,"%s",trun(CAPVEHICLE:MAKE))
+                  Writefile(L_FILE_NAME,"/%s",CAPVEHICLE:MODEL)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2350h+0V")
+                  Writefile(L_FILE_NAME,"%s",CAPVEHICLE:SERIAL_NO)
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+180V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","AGENCY/COMPANY ISSUING CARD")
+                  For l_loop = 1 to 3
+                  {
+                    If SFSAGENT:NAME[l_loop] <> "" then
+                      {
+                        Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                        Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                        Writefile(L_FILE_NAME,"%s",SFSAGENT:NAME[l_loop])
+                      }
+                  }
+
+                  For l_loop = 1 to 3
+                  {
+                    If SFSAGENT:address[l_loop] <> "" then
+                      {
+                        Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                        Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                        Writefile(L_FILE_NAME,"%s",SFSAGENT:address[l_loop])
+                      }
+                  }
+
+                  Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a600h+90V",Trun(SFSAGENT:CITY),", ",
+                                         SFSAGENT:STR_STATE," ",L_AGENT_ZIP)
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+180V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","INSURED")
+                  For L_LOOP = 1 To 3
+                    {
+                      If (SFPNAME:NAME[L_LOOP] <> "") Then
+                        {
+                          I_NAME = SFPNAME:NAME[L_LOOP]
+                          Include "sfsrevname7.pro"
+                          Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                          Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                          Writefile(L_FILE_NAME,"%s",Trun(I_REV_NAME))
+                          L_LINE_COUNTER = L_LINE_COUNTER + 1
+                        }
+                    }
+
+                  For L_LOOP = 1 To 3
+                    {
+                      If SFPNAME:ADDRESS[L_LOOP] <> "" Then
+                        {
+                          Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                          Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                          Writefile(L_FILE_NAME,"%s",SFPNAME:ADDRESS[L_LOOP])
+                          L_LINE_COUNTER = L_LINE_COUNTER + 1
+                        }
+                    }
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                  Writefile(L_FILE_NAME,"%s",Trun(SFPNAME:CITY))
+                  Writefile(L_FILE_NAME,"%s",", ")
+                  Writefile(L_FILE_NAME,"%s",SFPNAME:STR_STATE)
+                  Writefile(L_FILE_NAME,"%s","  ")
+                  Writefile(L_FILE_NAME,"%s",l_sfpname_zip)
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a1400h+180V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","SEE IMPORTANT NOTICE ON REVERSE SIDE")
+
+--                  If l_counter = 1 then
+--                    {
+                      Writefile(L_FILE_NAME,"jamie%s","<033>&a600h+120V")
+                      Writefile(L_FILE_NAME,"%s",l_arial_7)
+                      Writefile(L_FILE_NAME,"%s","------------------------------------------------")
+                      Writefile(L_FILE_NAME,"%s",l_arial_6)
+                      Writefile(L_FILE_NAME,"%s","CUT ALONG THIS LINE")
+                      Writefile(L_FILE_NAME,"%s",l_arial_7)
+                      Writefile(L_FILE_NAME,"%s","---------------------------------------------------------------")
+                      Writefile(L_FILE_NAME,"%s",l_arial_7)
+                      Writefile(L_FILE_NAME,"%s","-------------------------------------------------------------------------")
+                      Writefile(L_FILE_NAME,"%s",l_arial_6)
+                      Writefile(L_FILE_NAME,"%s","CUT ALONG THIS LINE")
+                      Writefile(L_FILE_NAME,"%s",l_arial_7)
+                      Writefile(L_FILE_NAME,"%s","------------------------------------------------")
+--                    }
+
+----dotted lines
+                  Writefile(L_FILE_NAME,"%s",L_pop)
+                  Writefile(L_FILE_NAME,"%s",L_push)
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+
+/*                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+*/
+----column 2 start
+                  Writefile(L_FILE_NAME,"%s",L_pop)
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a100h120V")
+
+                  L_STRING = "THIS CARD MUST BE CARRIED"
+                  L_FONT = l_arial_bold_8
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+0"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  L_STRING = "IN THE INSURED VEHICLE FOR"
+                  L_FONT = l_arial_bold_8
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+120"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  L_STRING = "PRODUCTION UPON DEMAND"
+                  L_FONT = l_arial_bold_9
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+120"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  L_STRING = "Report All Accidents To:"
+                  L_FONT = l_arial_9
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+480"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  L_STRING = "1-888-333-8198"
+                  L_FONT = L_ARIAL
+                  L_PITCH_HALF = 5
+                  L_PITCH_FULL = 10
+                  L_VERTICAL_POS = "+200"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a5350h+200V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","24 Hour")
+                  Writefile(L_FILE_NAME,"%s","<033>&a5900h+0V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","Toll Free")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a5100h+360V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","Claims may also be reported at:")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a5100h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","kmisclaims@knightcompany.com")
+
+                  l_counter = l_counter + 1
+
+                  if l_counter mod 2 = 0 then
+                    {
+                      Writefile(L_FILE_NAME,"%s","<FF>")
+                      l_counter = 0
+                    }
+
+            }  --for l_loop
+         }  --if statement
+      Next CAPVEHICLE
+    }
+END
+
+
+procedure print_id_cards
+
+BEGIN
+/*While CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+  {
+    l_counter = l_counter + 1
+     Next capvehicle
+  }
+*/
+Access CAPVEHICLE,
+   Set CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+       CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+       CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,Generic
+
+While CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR And
+      CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+  {
+    l_counter = l_counter + 1
+    L_CAPVEHICLE_STATE  = CAPVEHICLE:STATE
+    L_CAPVEHICLE_COUNTY = CAPVEHICLE:COUNTY
+
+    Access SCIPSCONTROL,
+       Set SCIPSCONTROL:COMPANY_ID = L_COMPANY_ID,
+           SCIPSCONTROL:STATE      = L_CAPVEHICLE_STATE,
+           SCIPSCONTROL:LOB_CODE   = L_LOB_CODE, Exact
+
+---column one start
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+120V")
+                  Writefile(L_FILE_NAME,"%s",L_PUSH)
+                  L_STRING = "Ohio Motor Vehicle Liability Insurance"
+                  L_FONT = L_ARIAL_bold_9
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+0"
+                  L_HORIZONTAL_POS = "2200"
+                  Include "center3.pro"
+
+                  L_STRING = "Identification Card"
+                  L_FONT = L_ARIAL_bold_9
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+120"
+                  L_HORIZONTAL_POS = "2200"
+                  Include "center3.pro"
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+240V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","COMPANY NUMBER")
+                  Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","COMPANY")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                  Writefile(L_FILE_NAME,"%s",trun(SCIPSCONTROL:AUTO_COMPANY_CODE))
+                  Writefile(L_FILE_NAME,"%s","<033>&a1500h+0V")
+                  Writefile(L_FILE_NAME,"%s",trun(l_arial_bold_7))
+                  Writefile(L_FILE_NAME,"%s",SFSCOMPANY:NAME[1])
+
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+170V")
+                  Writefile(L_FILE_NAME,"%s","POLICY NUMBER")
+                  Writefile(L_FILE_NAME,"%s","<033>&a1750h+0V")
+                  Writefile(L_FILE_NAME,"%s","EFFECTIVE DATE")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2850h+0V")
+                  Writefile(L_FILE_NAME,"%s","EXPIRATION DATE")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                  Writefile(L_FILE_NAME,"%s",trun(l_arial_bold_7))
+                  Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+                  Writefile(L_FILE_NAME,"%s","<033>&a1750h+0V")
+                  Writefile(L_FILE_NAME,"%d",SFPNAME:EFF_DATE)
+                  Writefile(L_FILE_NAME,"%s"," 12:01 AM")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2850h+0V")
+                  Writefile(L_FILE_NAME,"%d",SFPNAME:EXP_DATE)
+                  Writefile(L_FILE_NAME,"%s"," 12:01 AM")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+200V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","YEAR")
+                  Writefile(L_FILE_NAME,"%s","<033>&a1350h+0V")
+                  Writefile(L_FILE_NAME,"%s","MAKE/MODEL")
+                  Writefile(L_FILE_NAME,"%s","<033>&a2350h+0V")
+                  Writefile(L_FILE_NAME,"%s","VEHICLE IDENTIFICATION NUMBER")
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                  Writefile(L_FILE_NAME,"%s",trun(l_arial_bold_7))
+                  Writefile(L_FILE_NAME,"%n",CAPVEHICLE:YEAR)
+                  Writefile(L_FILE_NAME,"%s","<033>&a1350h+0V")
+                  Writefile(L_FILE_NAME,"%s",trun(CAPVEHICLE:MAKE))
+                  Writefile(L_FILE_NAME,"/%s",CAPVEHICLE:MODEL)
+                  Writefile(L_FILE_NAME,"%s","<033>&a2350h+0V")
+                  Writefile(L_FILE_NAME,"%s",CAPVEHICLE:SERIAL_NO)
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+180V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","AGENCY/COMPANY ISSUING CARD")
+                  For l_loop = 1 to 3
+                  {
+                    If SFSAGENT:NAME[l_loop] <> "" then
+                      {
+                        Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                        Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                        Writefile(L_FILE_NAME,"%s",SFSAGENT:NAME[l_loop])
+                      }
+                  }
+
+                  For l_loop = 1 to 3
+                  {
+                    If SFSAGENT:address[l_loop] <> "" then
+                      {
+                        Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                        Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                        Writefile(L_FILE_NAME,"%s",SFSAGENT:address[l_loop])
+                      }
+                  }
+
+                  Writefile(L_FILE_NAME,"%s%s%s%s%s%s","<033>&a600h+90V",Trun(SFSAGENT:CITY),", ",
+                                         SFSAGENT:STR_STATE," ",L_AGENT_ZIP)
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+180V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","INSURED")
+                  For L_LOOP = 1 To 3
+                    {
+                      If (SFPNAME:NAME[L_LOOP] <> "") Then
+                        {
+                          I_NAME = SFPNAME:NAME[L_LOOP]
+                          Include "sfsrevname7.pro"
+                          Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                          Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                          Writefile(L_FILE_NAME,"%s",Trun(I_REV_NAME))
+                          L_LINE_COUNTER = L_LINE_COUNTER + 1
+                        }
+                    }
+
+                  For L_LOOP = 1 To 3
+                    {
+                      If SFPNAME:ADDRESS[L_LOOP] <> "" Then
+                        {
+                          Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                          Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                          Writefile(L_FILE_NAME,"%s",SFPNAME:ADDRESS[L_LOOP])
+                          L_LINE_COUNTER = L_LINE_COUNTER + 1
+                        }
+                    }
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a600h+90V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_bold_7)
+                  Writefile(L_FILE_NAME,"%s",Trun(SFPNAME:CITY))
+                  Writefile(L_FILE_NAME,"%s",", ")
+                  Writefile(L_FILE_NAME,"%s",SFPNAME:STR_STATE)
+                  Writefile(L_FILE_NAME,"%s","  ")
+                  Writefile(L_FILE_NAME,"%s",L_SFPNAME_zip)
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a1400h+180V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_7)
+                  Writefile(L_FILE_NAME,"%s","SEE IMPORTANT NOTICE ON REVERSE SIDE")
+
+--                  If l_counter one of 1 then
+--                    {
+                      Writefile(L_FILE_NAME,"%s","<033>&a600h+180V")
+                      Writefile(L_FILE_NAME,"%s",l_arial_7)
+                      Writefile(L_FILE_NAME,"%s","------------------------------------------------")
+                      Writefile(L_FILE_NAME,"%s",l_arial_6)
+                      Writefile(L_FILE_NAME,"%s","CUT ALONG THIS LINE")
+                      Writefile(L_FILE_NAME,"%s",l_arial_7)
+                      Writefile(L_FILE_NAME,"%s","---------------------------------------------------------------")
+                      Writefile(L_FILE_NAME,"%s",l_arial_7)
+                      Writefile(L_FILE_NAME,"%s","-------------------------------------------------------------------------")
+                      Writefile(L_FILE_NAME,"%s",l_arial_6)
+                      Writefile(L_FILE_NAME,"%s","CUT ALONG THIS LINE")
+                      Writefile(L_FILE_NAME,"%s",l_arial_7)
+                      Writefile(L_FILE_NAME,"%s","------------------------------------------------")
+
+--                    }
+
+----dotted lines
+                  If l_counter = 1 then
+                    {
+                  Writefile(L_FILE_NAME,"%s",L_pop)
+                  Writefile(L_FILE_NAME,"%s",L_push)
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                }
+              else
+                {
+                  Writefile(L_FILE_NAME,"%s",L_pop)
+                  Writefile(L_FILE_NAME,"%s",L_push)
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+
+-----
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+                  Writefile(L_FILE_NAME,"%s","|")
+               }
+--                  Writefile(L_FILE_NAME,"%s","<033>&a4400h+120V")
+--                  Writefile(L_FILE_NAME,"%s",l_arial_6)
+--                  Writefile(L_FILE_NAME,"%s","|")
+
+
+
+----column 2 start
+                  Writefile(L_FILE_NAME,"%s",L_pop)
+                  Writefile(L_FILE_NAME,"%s","<033>&a5200h+120V")
+
+                  L_STRING = "THIS CARD MUST BE CARRIED"
+                  L_FONT = l_arial_bold_8
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+0"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  L_STRING = "IN THE INSURED VEHICLE FOR"
+                  L_FONT = l_arial_bold_8
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+120"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  L_STRING = "PRODUCTION UPON DEMAND"
+                  L_FONT = l_arial_bold_9
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+120"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  L_STRING = "Report All Accidents To:"
+                  L_FONT = l_arial_9
+                  L_PITCH_HALF = 4.5
+                  L_PITCH_FULL = 9
+                  L_VERTICAL_POS = "+480"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  L_STRING = "1-888-333-8198"
+                  L_FONT = L_ARIAL
+                  L_PITCH_HALF = 5
+                  L_PITCH_FULL = 10
+                  L_VERTICAL_POS = "+200"
+                  L_HORIZONTAL_POS = "5800"
+                  Include "center3.pro"
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a5350h+200V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","24 Hour")
+                  Writefile(L_FILE_NAME,"%s","<033>&a5900h+0V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","Toll Free")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a5100h+360V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","Claims may also be reported at:")
+
+                  Writefile(L_FILE_NAME,"%s","<033>&a5100h+120V")
+                  Writefile(L_FILE_NAME,"%s",l_arial_9)
+                  Writefile(L_FILE_NAME,"%s","kmisclaims@knightcompany.com")
+
+--                  If l_counter >= 1 then
+--                    {
+                      Writefile(L_FILE_NAME,"%s","<033>&a600h+720V")
+/*                    }
+                  else
+                    {
+                      Writefile(L_FILE_NAME,"%s","<033>&a600h+240V")
+                    }
+*/
+--                  l_counter = l_counter + 1
+
+    if l_counter =  2 then
+      {
+        Writefile(L_FILE_NAME,"%s","<FF>")
+        Writefile(L_FILE_NAME,"%s","<FF>")
+        l_counter = 0
+      }
+
+      Next CAPVEHICLE
+
+  }--While
+End
+
+END--End of Program

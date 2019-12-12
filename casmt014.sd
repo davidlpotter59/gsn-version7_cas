@@ -1,0 +1,118 @@
+%%
+Screen
+        Name = "casmt014" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Drive Other Car - Ver. 7.00     %m" ;
+        Domain = "CASDOC" ;
+--      resizeable = yes;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASDOC:RECORD_KEY <> "DO" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:        __________  ____________________________________________  |
+| State Code:        __    _________________________                           |
+| Line Of Business:  ____  ________________________________________            |
+| Effective Date:    __________                                                |
+*------------------------------------------------------------------------------*
+| Code:              _______     Broadened Coverage Code: _______              |
+|                                                                              |
+| Cov. A - Liability:                ______   Premium:    ___  Factor: _____   |
+| Cov. B - Medical Payments Limit:   _____    Premium:    __   Factor: _____   |
+|                                    _____                __                   |
+|                                    _____                __                   |
+|                                    _____                __                   |
+|                                    _____                __                   |
+| Cov. E - Um/Uim Limit:             ______   Premium:    __   Factor: _____   |
+| Cov. F - Comprehensive Deductible: _____    Premium:    ___  Factor: _____   |
+| Cov. G - Collision Deductible:     _____    Premium:    ___  Factor: _____   |
+|                                                                              |
+| Increase Limit Factor              ____                                      |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASDOC:RECORD_KEY = "DO"
+            CASDOC:FILLER = ""
+            CASDOC:DESCRIPTION = ""
+            End
+        End
+        CASDOC:COMPANY_ID                       Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASDOC:STATE                            Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASDOC:LINE_OF_BUSINESS                 Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASDOC:EFF_DATE                         Mandatory;
+801     CASDOC:CODE;
+802     casdoc:broadened_code/uppercase ;
+1001    CASDOC:LIABILITY;
+1002    CASDOC:LIABILITY_PREMIUM;
+1003    casdoc:liability_factor ;
+1101    CASDOC:MED_PAY_LIMIT[1];
+1102    CASDOC:MED_PAY_PREMIUM[1];
+1103    casdoc:med_pay_factor ;
+1201    CASDOC:MED_PAY_LIMIT[2];
+1202    CASDOC:MED_PAY_PREMIUM[2];
+1301    CASDOC:MED_PAY_LIMIT[3];
+1302    CASDOC:MED_PAY_PREMIUM[3];
+1401    CASDOC:MED_PAY_LIMIT[4];
+1402    CASDOC:MED_PAY_PREMIUM[4];
+1501    CASDOC:MED_PAY_LIMIT[5];
+1502    CASDOC:MED_PAY_PREMIUM[5];
+1601    CASDOC:UM_UIM_LIMIT;
+1602    CASDOC:UM_UIM_PREMIUM;
+1603    casdoc:um_uim_factor ;
+1701    CASDOC:COMP_DEDUCTIBLE;
+1702    CASDOC:COMP_PREMIUM;
+1703    casdoc:comp_factor ;
+1801    CASDOC:COLL_DEDUCTIBLE;
+1802    CASDOC:COLL_PREMIUM;
+1803    casdoc:coll_factor ;
+
+2001    casdoc:increase_limit_factor ;
+
+}
+
+End

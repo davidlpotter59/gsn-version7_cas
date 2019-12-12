@@ -1,0 +1,900 @@
+%%
+/*
+Date Written: October 22, 2001
+
+Name: casmca825.sd
+
+Copyright (c) 2000, SCIPS.com Inc.
+
+Modify
+Date                   By                  Comment
+--------------------------------------------------------------
+10/30/2001             DWR              Modified form for MSO
+                                        Italic & Bold Added
+12/28/2001             REL              Added the Data fields
+
+06/10/2002             REL              Added pedrstrian Pip with premiums > 0
+
+06/12/2002             RMG              Added while loop to item 5
+
+08/09/2002             RMG              Adding Code for Edition Date
+==============================================================
+*/
+
+Program
+  Name = "casmca825";
+  Type = "File";
+  Domain = "SFPPRINT1";
+  Padcharacter = Space;
+
+  String L_FILE_NAME[12] = "casmca825.cq";
+  String L_COPY_NAME[20] ;
+  String L_FORM_PRINT[15] ;
+  String L_INFILE[15]="casmca825.in";
+  String L_READ_INFILE[25];
+  string l_copyright[20] ;
+
+  Unsigned Ascii Number L_LINE_COUNTER;
+  Unsigned Ascii Number L_FUNERAL_EXPENSE;
+  unsigned ascii number l_edition[4]=0/dec=2 ;
+  unsigned ascii number l_form[1]=0 ;
+  Unsigned Ascii Number L_SECOND_COLUMN_LOC;
+  Unsigned Ascii Number L_VEHICLE_NUMBER[4];
+  Unsigned Ascii Number L_FLAG;
+  unsigned ascii number l_state[2] ;
+  Number L_PAGE_NUMBER = 1;
+  String L_READ;
+  string l_edition_print[10]="" ;
+
+  Include "swsut100.var"
+  Include "swsut201.var"
+  Include "swsut300.var"
+  Include "csfonts.inc"
+
+  Unsigned Ascii Number L_MAX_LINES= 57;
+  String L_LIMITATION[1];
+  String L_VEHICLE_TYPE;
+  Wdate L_ZERO_DATE;
+  Unsigned Ascii Number L_ZERO[5];
+  Wdate L_CURRENT_DATE;
+  Wdate L_LAST_DATE;
+  Unsigned Ascii Number L_MEDICAL_EXPENSE;
+  Unsigned Ascii Number L_VEHICLE_TOTALS;
+
+Initialization
+  Deletefile (L_FILE_NAME);
+
+Update
+
+Access SFPNAME,
+       Set SFPNAME:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           SFPNAME:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           SFPNAME:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access sfpmaster,
+       Set sfpmaster:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           sfpmaster:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           sfpmaster:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access CAPVEHICLE,
+       Set CAPVEHICLE:POLICY_NO = SFPPRINT1:POLICY_NO,
+           CAPVEHICLE:POL_YEAR  = SFPPRINT1:POL_YEAR,
+           CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access CAPPIP,
+       Set CAPPIP:POLICY_NO = SFPPRINT1:POLICY_NO,
+           CAPPIP:POL_YEAR  = SFPPRINT1:POL_YEAR,
+           CAPPIP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+l_state = capvehicle:state
+I_CODE = "MCA825"
+l_form = 0
+
+Access SFSEND, Set SFSEND:COMPANY_ID = sfpname:COMPANY_ID,
+                   SFSEND:STATE = L_STATE ,
+                   SFSEND:LINE_OF_BUSINESS = sfpname:LINE_OF_BUSINESS,
+                   SFSEND:FORM = L_FORM,
+                   sfsend:code = i_code, Generic
+
+Repeat Begin
+    Exit If SFSEND:COMPANY_ID <> sfpname:COMPANY_ID Or
+            SFSEND:STATE <> L_STATE Or
+            SFSEND:LINE_OF_BUSINESS <> sfpname:LINE_OF_BUSINESS Or
+            SFSEND:FORM <> L_FORM or
+            sfsend:code <> i_code
+
+/* update sfpprint2 with the mandatory endorsements that should print on the
+   common dec page */
+
+    If (SFPNAME:EFF_DATE >= SFSEND:EFF_DATE And
+       (SFPNAME:EFF_DATE <= SFSEND:EXP_DATE Or
+       SFSEND:EXP_DATE = 0)) Then
+        Begin
+        If SFSEND:RENEWAL = 1 And
+           SFPMASTER:TRANS_CODE = 14 Then
+            Begin
+            If ((SFPNAME:EFF_DATE <= SFSEND:EXP_DATE Or
+               SFSEND:EXP_DATE = 0) And
+               SFPNAME:EFF_DATE >= SFSEND:RENEWAL_EFF_DATE and
+               (sfpname:eff_date <= sfsend:renewal_exp_date or
+               sfsend:renewal_exp_date = 0)) Then
+                Begin
+                l_edition_print = sfsend:edition_print
+                l_form_print    = sfpend:form_print
+                End
+            End
+        Else
+            If SFSEND:NEW = 1 And
+               SFPMASTER:TRANS_CODE = 10 Then
+                Begin
+                If ((SFPNAME:EFF_DATE <= SFSEND:EXP_DATE Or
+                   SFSEND:EXP_DATE = 0) And
+                   SFPNAME:EFF_DATE >= SFSEND:NEW_EFF_DATE and
+                   (sfpname:eff_date <= sfsend:new_exp_date or
+                   sfsend:new_exp_date = 0)) Then
+                    Begin
+                    l_edition_print = sfsend:edition_print
+                    l_form_print    = sfsend:form_print
+                    End
+                End
+            Else
+            if sfsend:new = 0 and
+               sfsend:renewal = 0 then
+                Begin
+                l_edition_print = sfsend:edition_print
+                l_form_print    = sfsend:form_print
+                End
+
+        End
+
+    Next SFSEND
+    End
+
+access sfsoptend,
+   set sfsoptend:company_id       = sfpname:company_id,
+       sfsoptend:state            = l_state,
+       sfsoptend:line_of_business = sfpname:line_of_business,
+       sfsoptend:code             = i_code, generic
+
+l_edition = 0
+l_copyright = ""
+while sfsoptend:company_id       = sfpname:company_id and
+      sfsoptend:state            = l_state and
+      sfsoptend:line_of_business = sfpname:line_of_business and
+      sfsoptend:code             = i_code
+  begin
+  if (sfpname:eff_date >= sfsoptend:eff_date and
+     (sfpname:eff_date < sfsoptend:exp_date or
+     sfsoptend:exp_date = 0)) then
+        begin
+        l_form_print    = sfsoptend:form_Print
+        l_edition_print = sfsoptend:edition_print
+        l_edition       = sfsoptend:edition
+        l_copyright     = sfsoptend:copyright
+        end
+    next sfsoptend
+  end
+
+Include "swsut101.inc"
+I_CODE = "MCA825 "
+Include "swsut201.inc"
+Include "swsut300.inc"
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_12)
+Writefile(L_FILE_NAME,"%s","<033>&a4300h120V")
+Writefile(L_FILE_NAME,"%s",Trun(l_form_print))
+Writefile(L_FILE_NAME,"%s"," ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s",L_EDITION_PRINT)
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER + 2
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+0V")
+Writefile(L_FILE_NAME,"%s","SUPPLEMENTAL DECLARATIONS - NEW JERSEY PERSONAL INJURY PROTECTION")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+0V")
+Writefile(L_FILE_NAME,"%s","This Supplemental Declarations provides the schedule for showing ")
+Writefile(L_FILE_NAME,"%s","the various coverage options available in the New Jersey")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+0V")
+Writefile(L_FILE_NAME,"%s","Personal Injury Protection coverage provisions of endorsement MCA 820 and the lawsuit option.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+60V")
+Writefile(L_FILE_NAME,"%s","Except as provided below, all other provisions in the policy are unchanged.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h-60V<033>*c5800h5v0P")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER =L_LINE_COUNTER +2
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+0V")
+Writefile(L_FILE_NAME,"%s","Policy # ")
+Writefile(L_FILE_NAME,"%n",SFPPRINT1:POLICY_NO)
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+40V")
+Writefile(L_FILE_NAME,"%s","SCHEDULE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+40V")
+Writefile(L_FILE_NAME,"%s","Item 1.")
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","EXTENDED MEDICAL EXPENSE BENEFITS")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +2
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","Benefits:")
+Writefile(L_FILE_NAME,"%s","<033>&a2200h+0V")
+Writefile(L_FILE_NAME,"%s","Limit of Insurance:")
+Writefile(L_FILE_NAME,"%s","<033>&a4200h+0V")
+Writefile(L_FILE_NAME,"%s","Premium:")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+L_MEDICAL_EXPENSE = 0
+
+While CAPPIP:POLICY_NO = SFPPRINT1:POLICY_NO And
+      CAPPIP:POL_YEAR  = SFPPRINT1:POL_YEAR And
+      CAPPIP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+ Access CAPVEHICLE,
+    Set CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+        CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+        CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+        CAPVEHICLE:VEHICLE_NO   = CAPPIP:VEHICLE_NO, Generic
+
+ If CAPPIP:EXTENDED_MEDICAL_EXPENSE > L_MEDICAL_EXPENSE And
+    CAPVEHICLE:TYPE = 2 Then
+   {
+     L_MEDICAL_EXPENSE = CAPPIP:EXTENDED_MEDICAL_EXPENSE
+   }
+ Next CAPPIP
+}
+
+Access CAPPIP,
+       Set CAPPIP:POLICY_NO = SFPPRINT1:POLICY_NO,
+           CAPPIP:POL_YEAR  = SFPPRINT1:POL_YEAR,
+           CAPPIP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access CAPVEHICLE,
+       Set CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO,
+           CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR,
+           CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+60V")
+Writefile(L_FILE_NAME,"%s","Medical Expenses")
+Writefile(L_FILE_NAME,"%s","<033>&a2200h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(L_MEDICAL_EXPENSE,"ZZZ,ZZ9"))
+
+L_VEHICLE_TOTALS = 0
+
+While CAPVEHICLE:POLICY_NO = SFPPRINT1:POLICY_NO And
+      CAPVEHICLE:POL_YEAR  = SFPPRINT1:POL_YEAR And
+      CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  If CAPVEHICLE:VEHICLE_TOTALS[11] > 0 And
+     CAPVEHICLE:TYPE = 2 Then
+    {
+      L_VEHICLE_TOTALS = L_VEHICLE_TOTALS + CAPVEHICLE:VEHICLE_TOTALS[11] --Extended medical premium
+    }
+  Next CAPVEHICLE
+}
+
+Access CAPVEHICLE,
+       Set CAPVEHICLE:POLICY_NO = SFPPRINT1:POLICY_NO,
+           CAPVEHICLE:POL_YEAR  = SFPPRINT1:POL_YEAR,
+           CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL)
+Writefile(L_FILE_NAME,"%s","<033>&a2700h+0V")
+Writefile(L_FILE_NAME,"%s","Per person, per ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","accident")
+Writefile(L_FILE_NAME,"%s","<033>&a4200h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(L_VEHICLE_TOTALS,"ZZZ,ZZZ.99"))
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+L_FUNERAL_EXPENSE = 0
+
+While CAPVEHICLE:POLICY_NO = SFPPRINT1:POLICY_NO And
+      CAPVEHICLE:POL_YEAR  = SFPPRINT1:POL_YEAR And
+      CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+  {
+    If CAPVEHICLE:CLASS_CODE = 7391 Then
+      {
+        L_FUNERAL_EXPENSE = 1000
+      }
+    Next CAPVEHICLE
+  }
+
+Access CAPVEHICLE,
+       Set CAPVEHICLE:POLICY_NO = SFPPRINT1:POLICY_NO,
+           CAPVEHICLE:POL_YEAR  = SFPPRINT1:POL_YEAR,
+           CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+60V")
+Writefile(L_FILE_NAME,"%s","Funeral Expenses")
+Writefile(L_FILE_NAME,"%s","<033>&a2200h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","$")
+Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+Writefile(L_FILE_NAME,"%s",Str(L_FUNERAL_EXPENSE,"ZZZ,ZZ9"))
+Writefile(L_FILE_NAME,"%s",L_ARIAL)
+Writefile(L_FILE_NAME,"%s","<033>&a4200h+0V")
+Writefile(L_FILE_NAME,"%s","<NL>")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +2
+
+if l_edition = 0 then
+    begin
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a90h+0V")
+    Writefile(L_FILE_NAME,"%s","Item 2.")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_BOLD_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+    Writefile(L_FILE_NAME,"%s","PEDESTRIAN ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+    Writefile(L_FILE_NAME,"%s","PERSONAL INJURY PROTECTION ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","coverage ONLY is provided for the following vehicles")
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_LINE_COUNTER = L_LINE_COUNTER +1
+
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+    Writefile(L_FILE_NAME,"%s","designed for use principally on public roads which are not ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+    Writefile(L_FILE_NAME,"%s","private passenger automobiles ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","and to which")
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+    Writefile(L_FILE_NAME,"%s","the liability coverage of this policy applies.")
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_LINE_COUNTER = L_LINE_COUNTER + 2
+
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+    Writefile(L_FILE_NAME,"%s","Covered Vehicle")
+    Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+    Writefile(L_FILE_NAME,"%s","Premium")
+    Writefile(L_FILE_NAME,"%s","<NL>")
+    L_LINE_COUNTER = L_LINE_COUNTER + 1
+
+    While CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+          CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR  And
+          CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+        {
+        L_VEHICLE_NUMBER = CAPVEHICLE:VEHICLE_NO
+
+        Access CAPPIP, Set CAPPIP:POLICY_NO    = SFPPRINT1:POLICY_NO,
+                           CAPPIP:POL_YEAR     = SFPPRINT1:POL_YEAR,
+                           CAPPIP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+                           CAPPIP:VEHICLE_NO   = L_VEHICLE_NUMBER, Exact
+
+        If (CAPPIP:PEDESTRIAN = "Y") And (CAPVEHICLE:TYPE One Of 1, 3) Then
+            {
+            Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+            Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+            Writefile(L_FILE_NAME,"%n",CAPPIP:VEHICLE_NO)
+            Writefile(L_FILE_NAME,"%s","<033>&a3000h+0V")
+            Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+            Writefile(L_FILE_NAME,"%s","$")
+            Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+            Writefile(L_FILE_NAME,"%s",Str(CAPVEHICLE:VEHICLE_TOTALS[4],"ZZZ,ZZZ"))
+            Writefile(L_FILE_NAME,"%s","<NL>")
+
+            L_LINE_COUNTER = L_LINE_COUNTER +1
+
+            If L_LINE_COUNTER >= L_MAX_LINES Then
+                {
+                Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+                Writefile(L_FILE_NAME,"%s","<033>&a300h7200V")
+                Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_6)
+                Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+--                Writefile(L_FILE_NAME,"%s"," 2000 MSO, Inc.")
+                Writefile(L_FILE_NAME,"%s",trun(l_copyright))
+                Writefile(L_FILE_NAME,"%s","<FF>")
+                L_LINE_COUNTER = 1
+                }
+            }
+        Next CAPVEHICLE
+        }
+
+    end
+
+If L_LINE_COUNTER + 8 >= L_MAX_LINES Then
+  {
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a300h7200V")
+    Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_6)
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+--    Writefile(L_FILE_NAME,"%s"," 2000 MSO, Inc.")
+    Writefile(L_FILE_NAME,"%s",trun(l_copyright))
+    Writefile(L_FILE_NAME,"%s","<FF>")
+    L_LINE_COUNTER = 1
+  }
+Writefile(L_FILE_NAME,"%s","<NL>")
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+40V")
+if l_edition = 0 then
+    Writefile(L_FILE_NAME,"%s","Item 3.")
+else
+    Writefile(L_FILE_NAME,"%s","Item 2.")
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","MEDICAL EXPENSE BENEFITS DEDUCTIBLE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","A deductible of $250 is applicable to medical expense benefits on a per ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","accident ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","basis.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+40V")
+Writefile(L_FILE_NAME,"%s","If a deductible higher than $250 is chosen in Item 4 below, the higher deductible applies to the ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","named insured,")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","and if the ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","named insured ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","is an individual, any ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","family members, ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","on a per ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","accident ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","basis.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+If L_LINE_COUNTER + 25 >= L_MAX_LINES Then
+  {
+    Writefile(L_FILE_NAME,"%s","<FF>")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a300h7200V")
+    Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_6)
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+--    Writefile(L_FILE_NAME,"%s"," 2000 MSO, Inc.")
+    Writefile(L_FILE_NAME,"%s",trun(l_copyright))
+    Writefile(L_FILE_NAME,"%s","<FF>")
+    L_LINE_COUNTER = 1
+  }
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+80V")
+if l_edition = 0 then
+    Writefile(L_FILE_NAME,"%s","Item 4.")
+else
+    Writefile(L_FILE_NAME,"%s","Item 3.")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","In consideration of a reduction in premium, the following options apply as indicated below:")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+40V")
+Writefile(L_FILE_NAME,"%s","OPTIONAL MEDICAL EXPENSE BENEFITS DEDUCTIBLE")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","Any deductible indicated below for medical expense benefits applies only for the ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","named insured ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","and, if")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","the ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","named insured ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","is an individual, any ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","family members, ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","on a per ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","accident ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","basis.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Access CAPPIP,
+     Set CAPPIP:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPPIP:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPPIP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+Access CASPIPDEDUCT,
+   Set CASPIPDEDUCT:COMPANY_ID       = SFPNAME:COMPANY_ID,
+       CASPIPDEDUCT:STATE            = I_STATE,
+       CASPIPDEDUCT:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS, Generic
+
+While CASPIPDEDUCT:COMPANY_ID       = SFPNAME:COMPANY_ID And
+      CASPIPDEDUCT:STATE            = I_STATE And
+      CASPIPDEDUCT:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS
+{
+  If CASPIPDEDUCT:EFF_DATE <= SFPNAME:EFF_DATE And
+     CASPIPDEDUCT:EFF_DATE > L_LAST_DATE Then
+    {
+      L_LAST_DATE = CASPIPDEDUCT:EFF_DATE
+      L_CURRENT_DATE = CASPIPDEDUCT:EFF_DATE
+    }
+  Next CASPIPDEDUCT
+}
+
+Access CASPIPDEDUCT,
+   Set CASPIPDEDUCT:COMPANY_ID       = SFPNAME:COMPANY_ID,
+       CASPIPDEDUCT:STATE            = I_STATE,
+       CASPIPDEDUCT:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS, Generic
+
+While CASPIPDEDUCT:COMPANY_ID       = SFPNAME:COMPANY_ID And
+      CASPIPDEDUCT:STATE            = I_STATE And
+      CASPIPDEDUCT:LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS
+{
+  If CAPPIP:OPTIONAL_MED_EXP_DEDUCTIBLE = CASPIPDEDUCT:DEDUCTIBLE And
+     CASPIPDEDUCT:EFF_DATE = L_CURRENT_DATE Then
+    {
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a807h-7V")
+      Writefile(L_FILE_NAME,"%s","x")
+      Writefile(L_FILE_NAME,"%s","<033>&a790h+7V")
+      Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+      Writefile(L_FILE_NAME,"%s","o")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+      Writefile(L_FILE_NAME,"%s","$")
+      Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+      Writefile(L_FILE_NAME,"%s",Str(CASPIPDEDUCT:DEDUCTIBLE,"ZZ,ZZZ"))
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      L_LINE_COUNTER = L_LINE_COUNTER +1
+    }
+  Else
+  If CASPIPDEDUCT:EFF_DATE = L_CURRENT_DATE Then
+    {
+      Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+      Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+      Writefile(L_FILE_NAME,"%s","o")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+      Writefile(L_FILE_NAME,"%s","$")
+      Writefile(L_FILE_NAME,"%s",L_LETTER_GOTHIC_BOLD_10)
+      Writefile(L_FILE_NAME,"%s",Str(CASPIPDEDUCT:DEDUCTIBLE,"ZZ,ZZZ"))
+      Writefile(L_FILE_NAME,"%s","<NL>")
+      L_LINE_COUNTER = L_LINE_COUNTER +1
+    }
+  Next CASPIPDEDUCT
+}
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+60V")
+Writefile(L_FILE_NAME,"%s","In addition to the applicable deductible, medical expense benefits shall be reduced by a co-payment of 20% for")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","amounts payable between the applicable deductible and $5,000 - Refer to Limit of Insurance.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+60V")
+Writefile(L_FILE_NAME,"%s","DELETION OF BENEFITS OTHER THAN MEDICAL EXPENSE OPTION")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+If Uppercase(CAPPIP:DELETION_OF_BENEFITS) = "Y" Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a807h-7V")
+    Writefile(L_FILE_NAME,"%s","x")
+    Writefile(L_FILE_NAME,"%s","<033>&a790h+7V")
+    Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+    Writefile(L_FILE_NAME,"%s","o")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+    Writefile(L_FILE_NAME,"%s","All Personal Injury Protection benefits other than medical expense benefits are deleted with respect to the")
+    Writefile(L_FILE_NAME,"%s","<NL>")
+  }
+Else
+  If Uppercase(CAPPIP:DELETION_OF_BENEFITS) = "N" Then
+    {
+      Writefile(L_FILE_NAME,"%s","<033>&a790h+7V")
+      Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+      Writefile(L_FILE_NAME,"%s","o")
+      Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+      Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+      Writefile(L_FILE_NAME,"%s","All Personal Injury Protection benefits other than medical expense benefits are deleted with respect to the")
+      Writefile(L_FILE_NAME,"%s","<NL>")
+    }
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","named insured ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","and, if the ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","named insured ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","is an individual, any ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","family members, ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","when indicated by an 'X'")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+Writefile(L_FILE_NAME,"%s","in the box to the left. Refer to the DELETION OF BENEFITS OTHER THAN MEDICAL EXPENSES")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+Writefile(L_FILE_NAME,"%s","provision.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a790h+60V")
+Writefile(L_FILE_NAME,"%s","MEDICAL EXPENSE BENEFITS AS SECONDARY OPTION")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+If (CAPPIP:SECONDARY_OPTION = "Y") Then
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a807h-7V")
+    Writefile(L_FILE_NAME,"%s","x")
+    Writefile(L_FILE_NAME,"%s","<033>&a790h+7V")
+    Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+    Writefile(L_FILE_NAME,"%s","o")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+    Writefile(L_FILE_NAME,"%s","If the ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+    Writefile(L_FILE_NAME,"%s","named insured ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","is an individual, medical expense benefits with respect to the ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+    Writefile(L_FILE_NAME,"%s","named insured ")
+    Writefile(L_FILE_NAME,"%s","<NL>")
+  }
+Else
+  {
+    Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+    Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+    Writefile(L_FILE_NAME,"%s","o")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+    Writefile(L_FILE_NAME,"%s","If the ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+    Writefile(L_FILE_NAME,"%s","named insured ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","is an individual, medical expense benefits with respect to the ")
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+    Writefile(L_FILE_NAME,"%s","named insured ")
+    Writefile(L_FILE_NAME,"%s","<NL>")
+  }
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+Writefile(L_FILE_NAME,"%s","and ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","family members, ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","are secondary to")
+Writefile(L_FILE_NAME,"%s"," the health plans under which the ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","named insured ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","and ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","family")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_ITALIC_9)
+Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+Writefile(L_FILE_NAME,"%s","members ")
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","are insured, when indicated by an 'X' in the box to the left.")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+If L_LINE_COUNTER + 3 >= L_MAX_LINES Then
+  {
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+    Writefile(L_FILE_NAME,"%s","<033>&a300h7200V")
+    Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_6)
+    Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+--    Writefile(L_FILE_NAME,"%s"," 2000 MSO, Inc.")
+    Writefile(L_FILE_NAME,"%s",trun(l_copyright))
+    Writefile(L_FILE_NAME,"%s","<FF>")
+    L_LINE_COUNTER = 1
+  }
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_BOLD_9)
+Writefile(L_FILE_NAME,"%s","<033>&a90h+40V")
+if l_edition = 0 then
+    Writefile(L_FILE_NAME,"%s","Item 5.")
+else
+    Writefile(L_FILE_NAME,"%s","Item 4.")
+Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+Writefile(L_FILE_NAME,"%s","LAWSUIT OPTIONS")
+Writefile(L_FILE_NAME,"%s","<NL>")
+L_LINE_COUNTER = L_LINE_COUNTER +1
+
+L_LIMITATION = "N"
+
+Access CAPVEHICLE,
+       Set CAPVEHICLE:POLICY_NO = SFPPRINT1:POLICY_NO,
+           CAPVEHICLE:POL_YEAR  = SFPPRINT1:POL_YEAR,
+           CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE, Generic
+
+While CAPVEHICLE:POLICY_NO    = SFPPRINT1:POLICY_NO And
+      CAPVEHICLE:POL_YEAR     = SFPPRINT1:POL_YEAR  And
+      CAPVEHICLE:END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+{
+  L_VEHICLE_NUMBER = CAPVEHICLE:VEHICLE_NO
+
+  Access CAPPIP,
+     Set CAPPIP:POLICY_NO    = SFPPRINT1:POLICY_NO,
+         CAPPIP:POL_YEAR     = SFPPRINT1:POL_YEAR,
+         CAPPIP:END_SEQUENCE = SFPPRINT1:END_SEQUENCE,
+         CAPPIP:VEHICLE_NO   = L_VEHICLE_NUMBER, Exact
+
+  If CAPPIP:LIMITATION = "Y" Then
+    {
+      L_LIMITATION = CAPPIP:LIMITATION
+    }
+
+  If CAPVEHICLE:TYPE One Of 2, 5, 7 Then
+    {
+      L_VEHICLE_TYPE = "Y"
+    }
+
+  Next CAPVEHICLE
+}
+
+If L_VEHICLE_TYPE = "Y" Then
+  {
+    If Uppercase(L_LIMITATION) = "N" Then
+      {
+        Writefile(L_FILE_NAME,"%s","<033>&a807h-7V")
+        Writefile(L_FILE_NAME,"%s","x")
+        Writefile(L_FILE_NAME,"%s","<033>&a790h+7V")
+        Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+        Writefile(L_FILE_NAME,"%s","o")
+        Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+        Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+        Writefile(L_FILE_NAME,"%s","Limitation on Lawsuit Option")
+        Writefile(L_FILE_NAME,"%s","<NL>")
+      }
+    Else
+      {
+        Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+        Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+        Writefile(L_FILE_NAME,"%s","o")
+        Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+        Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+        Writefile(L_FILE_NAME,"%s","Limitation on Lawsuit Option")
+        Writefile(L_FILE_NAME,"%s","<NL>")
+      }
+    L_LINE_COUNTER = L_LINE_COUNTER +1
+
+    If L_LIMITATION = "Y" Then
+      {
+        Writefile(L_FILE_NAME,"%s","<033>&a807h-7V")
+        Writefile(L_FILE_NAME,"%s","x")
+        Writefile(L_FILE_NAME,"%s","<033>&a790h+7V")
+        Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+        Writefile(L_FILE_NAME,"%s","o")
+        Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+        Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+        Writefile(L_FILE_NAME,"%s","No Limitation on Lawsuit Option")
+        Writefile(L_FILE_NAME,"%s","<NL>")
+      }
+    Else
+      {
+        Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+        Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+        Writefile(L_FILE_NAME,"%s","o")
+        Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+        Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+        Writefile(L_FILE_NAME,"%s","No Limitation on Lawsuit Option")
+        Writefile(L_FILE_NAME,"%s","<NL>")
+      }
+     L_LINE_COUNTER = L_LINE_COUNTER +1
+  }
+Else
+  {
+   Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+   Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+   Writefile(L_FILE_NAME,"%s","o")
+   Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+   Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+   Writefile(L_FILE_NAME,"%s","Limitation on Lawsuit Option")
+   Writefile(L_FILE_NAME,"%s","<NL>")
+   L_LINE_COUNTER = L_LINE_COUNTER +1
+
+   Writefile(L_FILE_NAME,"%s","<033>&a790h+0V")
+   Writefile(L_FILE_NAME,"%s",L_WINGDINGS)
+   Writefile(L_FILE_NAME,"%s","o")
+   Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+   Writefile(L_FILE_NAME,"%s","<033>&a950h+0V")
+   Writefile(L_FILE_NAME,"%s","No Limitation on Lawsuit Option")
+   Writefile(L_FILE_NAME,"%s","<NL>")
+   L_LINE_COUNTER = L_LINE_COUNTER +1
+  }
+
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+Writefile(L_FILE_NAME,"%s","<033>&a300h7200V")
+Writefile(L_FILE_NAME,"%s",L_COPYRIGHT_6)
+Writefile(L_FILE_NAME,"%s",L_ARIAL_9)
+--Writefile(L_FILE_NAME,"%s"," 2000 MSO, Inc.")
+Writefile(L_FILE_NAME,"%s",trun(l_copyright))
+Writefile(L_FILE_NAME,"%s","<FF>")
+
+Screen Exit
+  Writefile(L_FILE_NAME,"%s%s",L_FORMFEED,L_RESET)
+  Closefile(L_FILE_NAME)
+End

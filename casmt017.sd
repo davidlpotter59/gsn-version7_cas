@@ -1,0 +1,98 @@
+%%
+Screen
+        Name = "casmt017" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Financial Responsibility Laws Certification - Ver. 7.00    %m" ;
+        Domain = "CASLAWCERT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASLAWCERT:RECORD_KEY <> "LC" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+| Description: ____________________________________________________________    |
+| Factor:      _____                                                           |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASLAWCERT:RECORD_KEY = "LC"
+            CASLAWCERT:FILLER = ""
+            CASLAWCERT:DESCRIPTION1 = ""
+            End
+        End
+        CASLAWCERT:COMPANY_ID                   Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASLAWCERT:STATE                     Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASLAWCERT:LINE_OF_BUSINESS             Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASLAWCERT:EFF_DATE                     Mandatory;
+801     CASLAWCERT:DESCRIPTION[1];
+901     CASLAWCERT:FACTOR[1];
+1001    CASLAWCERT:DESCRIPTION[2];
+1101    CASLAWCERT:FACTOR[2];
+1201    CASLAWCERT:DESCRIPTION[3];
+1301    CASLAWCERT:FACTOR[3];
+1401    CASLAWCERT:DESCRIPTION[4];
+1501    CASLAWCERT:FACTOR[4];
+1601    CASLAWCERT:DESCRIPTION[5];
+1701    CASLAWCERT:FACTOR[5];
+
+}
+
+End

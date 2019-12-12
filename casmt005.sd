@@ -1,0 +1,95 @@
+%%
+Screen
+        Name = "casmt005" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Rating Factors - Ver. 7.00    %m" ;
+        Domain = "CASFACTORS" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __     _________________________                           |
+| Line Of Business: ____   ________________________________________            |
+| Type:             _      ___________________________________________________ |
+| Class Code:       _____                                                      |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+|             Liability                       Physical Damage                  |
+|                                                                              |
+|              ______                            ______                        |
+|              ______                            ______                        |
+*------------------------------------------------------------------------------*
+
+
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASFACTORS:RECORD_KEY = "RF"
+            CASFACTORS:FILLER = ""
+            CASFACTORS:DESCRIPTION = ""
+            End
+        End
+        CASFACTORS:COMPANY_ID                   Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASFACTORS:STATE                        Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASFACTORS:LINE_OF_BUSINESS             Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASFACTORS:TYPE                         Mandatory
+        If CASFACTORS:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASFACTORS:CLASS_CODE                   Mandatory;
+801     CASFACTORS:EFF_DATE                     Mandatory;
+1201    CASFACTORS:FACTORS[1];
+1202    CASFACTORS:FACTORS[2];
+1301    CASFACTORS:FACTORS_1[1];
+1302    CASFACTORS:FACTORS_1[2];
+
+}
+
+End

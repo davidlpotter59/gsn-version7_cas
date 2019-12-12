@@ -1,0 +1,131 @@
+%%
+Screen
+        Name = "casmt031" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Additional 1st Party Benefits (PA) - Ver. 7.00     %m" ;
+        Domain = "CASADDITIONAL" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASADDITIONAL:RECORD_KEY <> "AD" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State Code:           __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Medical Expense:      ________             _______                           |
+|                       ________             _______                           |
+|                       ________             _______                           |
+|                       ________             _______                           |
+*------------------------------------------------------------------------------*
+|                       Monthly    Total                                       |
+| Work Loss:            _____     ________   _______                           |
+|                       _____     ________   _______                           |
+|                       _____     ________   _______                           |
+|                       _____     ________   _______                           |
+*------------------------------------------------------------------------------*
+| Funeral Expense:      _____                _______                           |
+|                       _____                _______                           |
+*------------------------------------------------------------------------------*
+| Accidental Death:     ________             _______                           |
+|                       ________             _______                           |
+|                       ________             _______                           |
+*------------------------------------------------------------------------------*
+| Code:                 _______     Seating: _______                           |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASADDITIONAL:RECORD_KEY = "AD"
+            CASADDITIONAL:FILLER = ""
+            End
+        End
+        CASADDITIONAL:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASADDITIONAL:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASADDITIONAL:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASADDITIONAL:EFF_DATE                   Mandatory;
+801     CASADDITIONAL:MEDICAL_LIMIT[1];
+802     CASADDITIONAL:MEDICAL_charge[1];
+901     CASADDITIONAL:MEDICAL_LIMIT[2];
+902     CASADDITIONAL:MEDICAL_charge[2];
+1001    CASADDITIONAL:MEDICAL_LIMIT[3];
+1002    CASADDITIONAL:MEDICAL_charge[3];
+1101    CASADDITIONAL:MEDICAL_LIMIT[4];
+1102    CASADDITIONAL:MEDICAL_charge[4];
+
+1401    CASADDITIONAL:WORK_MONTHLY_LIMIT[1];
+1402    CASADDITIONAL:WORK_TOTAL_LIMIT[1];
+1403    CASADDITIONAL:WORK_charge[1];
+1501    CASADDITIONAL:WORK_MONTHLY_LIMIT[2];
+1502    CASADDITIONAL:WORK_TOTAL_LIMIT[2];
+1503    CASADDITIONAL:WORK_charge[2];
+1601    CASADDITIONAL:WORK_MONTHLY_LIMIT[3];
+1602    CASADDITIONAL:WORK_TOTAL_LIMIT[3];
+1603    CASADDITIONAL:WORK_charge[3];
+1701    CASADDITIONAL:WORK_MONTHLY_LIMIT[4];
+1702    CASADDITIONAL:WORK_TOTAL_LIMIT[4];
+1703    CASADDITIONAL:WORK_charge[4];
+
+1901    CASADDITIONAL:FUNERAL_LIMIT[1];
+1902    CASADDITIONAL:FUNERAL_charge[1];
+2001    CASADDITIONAL:FUNERAL_LIMIT[2];
+2002    CASADDITIONAL:FUNERAL_charge[2];
+
+2201    CASADDITIONAL:ACCIDENT_LIMIT[1];
+2202    CASADDITIONAL:ACCIDENT_charge[1];
+2301    CASADDITIONAL:ACCIDENT_LIMIT[2];
+2302    CASADDITIONAL:ACCIDENT_charge[2];
+2401    CASADDITIONAL:ACCIDENT_LIMIT[3];
+2402    CASADDITIONAL:ACCIDENT_charge[3];
+2601    CASADDITIONAL:CODE/uppercase ;
+2602    casadditional:seating_factor ;
+
+}
+
+End

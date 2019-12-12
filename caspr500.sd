@@ -1,0 +1,544 @@
+%%
+Program
+        Name = "CASPR500" ;
+        Type = "File" ;
+        Padcharacter = Space ;
+        Domain = "SFPPRINT" ;
+
+      Global string g_process_policy_mgt_agent_copy[1] = "Y";   --makes sure agent copy does not go to policy mangement system
+      Global Unsigned Ascii Number G_POLICY_NO[9] ,
+                                   G_YEAR[4] ,
+                                   G_END_SEQUENCE[4] ,
+                                   G_VEHICLE_NO[4] ;
+      Global procedure policy_management_update(number,number,number,string,number,number,string,string,string); --"policy_management_lib".policy_management_update
+      Global string function get_transaction_type(number)
+      Global string function Get_converted_status(number,number)
+
+      Global String G_QUE[10] ;
+
+      Local String L_MACRO[15]="" ,
+                   L_REPORT[15]="",
+                   L_COMPANY_ID[10]="",
+                   L_DESCRIPTION[75]="" ,
+                   L_FORM_EDITION[25]="" ,
+                   L_CSEXEC_NUMBER[12]="",
+                   L_CODE[7]="" ,
+                   l_agent_copy_dec[25]="",
+                   L_BU0601[1]="N",
+                   L_BU0602[1]="N",
+                   L_BU0603[1]="N",
+                   L_BU0604[1]="N",
+                   L_BU0605[1]="N",
+                   L_BU0606[1]="N",
+                   L_BU0607[1]="N",
+                   L_BU0608[1]="N",
+                   L_BU0609[1]="N",
+                   L_BU0616[1]="N",
+                   L_BU1009[1]="N",
+                   L_MAILER[1]="N" ,
+                   L_PARAMETER[20]="" ,
+                   L_COPY_NAME[20] ,
+                   L_APP[3]="sfs" ,
+                   L_DEC[15]="" ,
+                   L_HIT_CODE[1]="Y",
+                   L_HOLD_CODE[7]="",
+                   L_PRINT_SUPP[1] ;
+
+      Local Unsigned Ascii Number L_STATE[2],
+                                  L_LINE_OF_BUSINESS[4],
+                                  L_POLICY_NO[9]=1 ,
+                                  L_PRINTER[4]=0,
+                                  l_dont_print_agent_copy[1],
+                                  L_SUB_CODE[4] ,
+                                  l_end_sequence[4]=0,
+                                  L_FORM[1]=0,
+                                  L_PREM_NO[4]=0,
+                                  L_BUILD_NO[4]=0,
+                                  L_PREMIUM[6]=0,
+                                  L_NO_COPIES[4]=0,
+                                  L_COPIES[4]=0 ,
+                                  L_COPIES_PRINTED[3]=0 ;
+
+      Include "csexec.var"
+
+      Include "STDKEYS.INC"
+
+Initialisation
+L_PRINTER = Val(COMMANDLINE[1,4])
+L_CSEXEC_NUMBER = COMMANDLINE[5,17]
+Do BEGIN_PROCESSING
+
+Update
+
+Errors
+Writefile("caspr500.err","%n",ERRORNUMBER)
+Writefile("caspr500.err","%s",ERRORTEXT)
+Closefile("caspr500.err")
+
+Procedure Definition
+
+Procedure BEGIN_PROCESSING
+Begin
+L_POLICY_NO = 0
+Access SFPPRINT1, Set SFPPRINT1:POLICY_NO = L_POLICY_NO, Approximate
+
+G_POLICY_NO = SFPPRINT1:POLICY_NO
+G_YEAR = SFPPRINT1:POL_YEAR
+G_END_SEQUENCE = SFPPRINT1:END_SEQUENCE
+L_COPY_NAME = SFPPRINT1:COPY_NAME
+
+Access SFPNAME, Set SFPNAME:POLICY_NO = G_POLICY_NO,
+                    SFPNAME:POL_YEAR = G_YEAR,
+                    SFPNAME:END_SEQUENCE = G_END_SEQUENCE, Generic
+
+Access SFPMASTER,
+   Set SFPMASTER:POLICY_NO    = G_POLICY_NO,
+       SFPMASTER:POL_YEAR     = G_YEAR,
+       SFPMASTER:END_SEQUENCE = G_END_SEQUENCE, Exact
+
+Access capvehicle,
+   Set capvehicle:POLICY_NO    = G_POLICY_NO,
+       capvehicle:POL_YEAR     = G_YEAR,
+       capvehicle:END_SEQUENCE = G_END_SEQUENCE, Generic
+
+l_state = capvehicle:state
+l_line_of_business = capvehicle:line_of_business
+access sfsagtprt, set sfsagtprt:company_id       = sfpname:company_id,
+                      sfsagtprt:agent_no         = sfpname:agent_no,
+                      sfsagtprt:state            = l_state,
+                      sfsagtprt:line_of_business = l_line_of_business, generic
+
+l_dont_print_agent_copy = 0
+while sfsagtprt:company_id       = sfpname:company_id and
+      sfsagtprt:agent_no         = sfpname:agent_no and
+      sfsagtprt:state            = l_state and
+      sfsagtprt:line_of_business = l_line_of_business
+        begin
+        if (sfpname:eff_date >= sfsagtprt:eff_date and
+           (sfpname:eff_date < sfsagtprt:exp_date or
+           sfsagtprt:exp_date = 0)) then
+            begin
+            switch(sfpmaster:trans_code)
+              case 14 : l_dont_print_agent_copy = sfsagtprt:dont_print_agent_copy_renewal
+              case 10 : l_dont_print_agent_copy = sfsagtprt:dont_print_agent_copy_new
+              case 11 : l_dont_print_agent_copy = sfsagtprt:dont_print_agent_copy_cx
+              case 16 : l_dont_print_agent_copy = sfsagtprt:dont_print_agent_copy_reins
+              default : l_dont_print_agent_copy = sfsagtprt:dont_print_agent_copy_endorse
+              end
+            end
+
+        next sfsagtprt
+        end
+
+If L_COPY_NAME = "ALL" Then
+    Begin
+    L_COPIES_PRINTED = 0
+    If SFPPRINT1:SCAN_HOME_OFFICE = 0 Then
+        begin
+        if l_dont_print_agent_copy = 1 then
+            l_no_copies = 2
+        else
+            L_NO_COPIES = 3
+        end
+    Else
+        begin
+        if l_dont_print_agent_copy = 1 then
+            L_NO_COPIES = 1
+        else
+            l_no_copies = 2
+        end
+
+    L_COPIES = 0
+    End
+
+L_MAILER = "N"
+
+/* get number of copies that should be printed by line of business */
+
+Do GET_CAS_COPIES
+
+/* set macro and parameter file using csexec to keep it unique so we dont get
+   errors trying to create this file */
+
+L_PARAMETER = "sfpdecssfp.par"
+L_DEC = L_APP+Trun(L_CSEXEC_NUMBER)+".cq"
+l_agent_copy_dec = l_app+"_agent_" + Trun(L_CSEXEC_NUMBER)+".cq"
+L_MACRO = L_APP+Trun(L_CSEXEC_NUMBER)+".mf"
+
+/* create the macro */
+
+Do GET_MACRO
+
+/* end of begin_process */
+End
+
+Procedure GET_CAS_COPIES
+Begin
+Access SFPSUPP1, Set SFPSUPP1:POLICY_NO = G_POLICY_NO,
+                     SFPSUPP1:POL_YEAR = G_YEAR,
+                     SFPSUPP1:END_SEQUENCE = G_END_SEQUENCE, Generic
+
+Repeat Begin
+    Exit If SFPSUPP1:POLICY_NO <> G_POLICY_NO Or
+            SFPSUPP1:POL_YEAR <> G_YEAR Or
+            SFPSUPP1:END_SEQUENCE <> G_END_SEQUENCE
+
+    L_NO_COPIES = L_NO_COPIES + 1
+    L_COPIES = L_COPIES + 1
+
+    Next SFPSUPP1
+    End
+
+L_SUB_CODE = 0
+Access CAPVEHICLE, Set CAPVEHICLE:POLICY_NO = G_POLICY_NO,
+                       CAPVEHICLE:POL_YEAR = G_YEAR,
+                       CAPVEHICLE:END_SEQUENCE = G_END_SEQUENCE, Generic
+
+Access SFPMASTER, Set SFPMASTER:POLICY_NO = G_POLICY_NO,
+                      SFPMASTER:POL_YEAR = G_YEAR,
+                      SFPMASTER:END_SEQUENCE = G_END_SEQUENCE, Exact
+
+l_end_sequence = 0
+Access SFPMASTER_ALIAS, Set SFPMASTER_ALIAS:POLICY_NO = G_POLICY_NO,
+                            SFPMASTER_alias:POL_YEAR = G_YEAR,
+                            SFPMASTER_alias:END_SEQUENCE = L_END_SEQUENCE, Exact
+
+L_STATE = CAPVEHICLE:STATE
+L_COMPANY_ID = SFPNAME:COMPANY_ID
+L_LINE_OF_BUSINESS = SFPNAME:LINE_OF_BUSINESS
+L_FORM = 0
+Access SFSEND, Set SFSEND:COMPANY_ID = L_COMPANY_ID,
+                   SFSEND:STATE = L_STATE ,
+                   SFSEND:LINE_OF_BUSINESS = L_LINE_OF_BUSINESS,
+                   SFSEND:FORM = L_FORM, Generic
+
+Repeat Begin
+    Exit If SFSEND:COMPANY_ID <> L_COMPANY_ID Or
+            SFSEND:STATE <> L_STATE Or
+            SFSEND:LINE_OF_BUSINESS <> L_LINE_OF_BUSINESS Or
+            SFSEND:FORM <> L_FORM
+
+/* update sfpprint2 with the mandatory endorsements that should print on the
+   common dec page */
+
+    If (SFPNAME:EFF_DATE >= SFSEND:EFF_DATE And
+       (SFPNAME:EFF_DATE <= SFSEND:EXP_DATE Or
+       SFSEND:EXP_DATE = 0)) Then
+        Begin
+        If SFSEND:RENEWAL = 1 And
+           SFPMASTER_ALIAS:TRANS_CODE = 14 Then
+            Begin
+            If ((SFPNAME:EFF_DATE <= SFSEND:EXP_DATE Or
+               SFSEND:EXP_DATE = 0) And
+               SFPNAME:EFF_DATE >= SFSEND:RENEWAL_EFF_DATE and
+               (sfpname:eff_date <= sfsend:renewal_exp_date or
+               sfsend:renewal_exp_date = 0)) Then
+                Begin
+                Do SUBCODE
+                L_CODE = SFSEND:CODE
+                L_FORM_EDITION = SFSEND:FORM_EDITION
+                L_DESCRIPTION = SFSEND:DESCRIPTION
+                Do ADD_SFPPRINT2
+                End
+            End
+        Else
+            If SFSEND:NEW = 1 And
+               SFPMASTER_ALIAS:TRANS_CODE = 10 Then
+                Begin
+                If ((SFPNAME:EFF_DATE <= SFSEND:EXP_DATE Or
+                   SFSEND:EXP_DATE = 0) And
+                   SFPNAME:EFF_DATE >= SFSEND:NEW_EFF_DATE and
+                   (sfpname:eff_date <= sfsend:new_exp_date or
+                   sfsend:new_exp_date = 0)) Then
+                    Begin
+                    Do SUBCODE
+                    L_CODE = SFSEND:CODE
+                    L_FORM_EDITION = SFSEND:FORM_EDITION
+                    L_DESCRIPTION = SFSEND:DESCRIPTION
+                    Do ADD_SFPPRINT2
+                    End
+                End
+            Else
+            if sfsend:new = 0 and
+               sfsend:renewal = 0 then
+                Begin
+                Do SUBCODE
+                L_CODE = SFSEND:CODE
+                L_FORM_EDITION = SFSEND:FORM_EDITION
+                L_DESCRIPTION = SFSEND:DESCRIPTION
+                Do ADD_SFPPRINT2
+                End
+
+        End
+
+    Next SFSEND
+    End
+
+Access SFPEND1, Set SFPEND1:POLICY_NO = G_POLICY_NO,
+                    SFPEND1:POL_YEAR = G_YEAR,
+                    SFPEND1:END_SEQUENCE = G_END_SEQUENCE, Generic
+
+Repeat Begin
+    Exit If SFPEND1:POLICY_NO <> G_POLICY_NO Or
+            SFPEND1:POL_YEAR <> G_YEAR Or
+            SFPEND1:END_SEQUENCE <> G_END_SEQUENCE
+
+        L_CODE = SFPEND1:CODE
+        L_PREM_NO = SFPEND1:VEHICLE_NO
+        L_BUILD_NO = 0
+        L_FORM_EDITION = SFPEND1:FORM_EDITION
+        L_DESCRIPTION = SFPEND1:DESCRIPTION
+        Do ADD_SFPPRINT3
+
+    Next SFPEND1
+    End
+
+/* end of get_cas_copies */
+End
+
+Procedure ADD_SFPPRINT2
+Begin
+
+Add SFPPRINT2
+    Begin
+    SFPPRINT2:POLICY_NO = G_POLICY_NO
+    SFPPRINT2:POL_YEAR = G_YEAR
+    SFPPRINT2:END_SEQUENCE = G_END_SEQUENCE
+    SFPPRINT2:SUB_CODE = L_SUB_CODE
+    SFPPRINT2:FORM_EDITION = L_FORM_EDITION
+    SFPPRINT2:DESCRIPTION = L_DESCRIPTION
+    sfpprint2:line_of_business = capvehicle:line_of_business
+    End
+
+-- End of add_sfpprint2
+End
+
+
+Procedure ADD_SFPPRINT3
+Begin
+Access SFPPRINT3, Set SFPPRINT3:POLICY_NO    = G_POLICY_NO,
+                      SFPPRINT3:POL_YEAR     = G_YEAR,
+                      SFPPRINT3:END_SEQUENCE = G_END_SEQUENCE,
+                      SFPPRINT3:PREM_NO      = L_PREM_NO,
+                      SFPPRINT3:BUILD_NO     = L_BUILD_NO,
+                      SFPPRINT3:CODE         = L_CODE, Generic
+
+If SFPPRINT3:POLICY_NO    <> G_POLICY_NO Or
+   SFPPRINT3:POL_YEAR     <> G_YEAR Or
+   SFPPRINT3:END_SEQUENCE <> G_END_SEQUENCE Or
+   SFPPRINT3:PREM_NO      <> L_PREM_NO Or
+   SFPPRINT3:BUILD_NO     <> L_BUILD_NO Or
+   SFPPRINT3:CODE         <> L_CODE Then
+    Add SFPPRINT3
+        Begin
+        SFPPRINT3:POLICY_NO    = G_POLICY_NO
+        SFPPRINT3:POL_YEAR     = G_YEAR
+        SFPPRINT3:END_SEQUENCE = G_END_SEQUENCE
+        SFPPRINT3:PREM_NO      = L_PREM_NO
+        SFPPRINT3:BUILD_NO     = L_BUILD_NO
+        SFPPRINT3:CODE         = L_CODE
+        SFPPRINT3:FORM_EDITION = L_FORM_EDITION
+        SFPPRINT3:DESCRIPTION  = L_DESCRIPTION
+        SFPPRINT3:PRINT_FORM   = "Y"
+
+        L_HOLD_CODE = SFPPRINT3:CODE
+        L_HIT_CODE = "N"
+
+        Do CHECK_FOR_DUP_CODE
+
+        If L_HIT_CODE = "Y" Then
+            Begin
+            SFPPRINT3:PRINT_FORM = "N"
+            End
+        Else
+            Begin
+            SFPPRINT3:PRINT_FORM = "Y"
+            End
+
+        End
+
+-- End of add_sfpprint3
+End
+
+Procedure SUBCODE
+Begin
+/* get sub code to update sfpprint2 to keep key unique */
+
+Access SFPPRINT2_ALIAS, Set SFPPRINT2_ALIAS:POLICY_NO = G_POLICY_NO,
+                            SFPPRINT2_ALIAS:POL_YEAR = G_YEAR,
+                            SFPPRINT2_ALIAS:END_SEQUENCE = G_END_SEQUENCE, Generic
+
+L_SUB_CODE = 0
+Repeat Begin
+    Exit If SFPPRINT2_ALIAS:POLICY_NO <> G_POLICY_NO Or
+            SFPPRINT2_ALIAS:POL_YEAR <> G_YEAR Or
+            SFPPRINT2_ALIAS:END_SEQUENCE <> G_END_SEQUENCE
+
+        L_SUB_CODE = SFPPRINT2_ALIAS:SUB_CODE
+
+    Next SFPPRINT2_ALIAS
+    End
+
+L_SUB_CODE = L_SUB_CODE + 10
+
+/* end of subcode */
+End
+
+Procedure GET_MACRO
+Begin
+If L_COPY_NAME = "ALL" Then
+    Begin
+    L_COPIES_PRINTED = 1
+    Repeat Begin
+        Exit If L_COPIES_PRINTED > L_NO_COPIES
+
+        If SFPPRINT1:SCAN_HOME_OFFICE = 0 Then
+            Begin
+            if l_dont_print_agent_copy = 1 then
+                begin
+                Switch(L_COPIES_PRINTED)
+                  Case 1  : L_COPY_NAME = "Original"
+                  Case 2  : L_COPY_NAME = "Home Office"
+                  Default : L_COPY_NAME = "Copy"
+                  End
+                end
+            else
+                begin
+                Switch(L_COPIES_PRINTED)
+                  Case 1  : L_COPY_NAME = "Original"
+                  Case 2  : L_COPY_NAME = "Agents Copy"
+                  Case 3  : L_COPY_NAME = "Home Office"
+                  Default : L_COPY_NAME = "Copy"
+                  End
+                end
+            End
+        Else
+            Begin
+            if l_dont_print_agent_copy = 1 then
+                begin
+                Switch(L_COPIES_PRINTED)
+                  Case 1  : L_COPY_NAME = "Original"
+                  Default : L_COPY_NAME = "Copy"
+                  End
+                end
+            else
+                begin
+                Switch(L_COPIES_PRINTED)
+                  Case 1  : L_COPY_NAME = "Original"
+                  Case 2  : L_COPY_NAME = "Agents Copy"
+                  Default : L_COPY_NAME = "Copy"
+                  End
+                end
+            End
+
+        If SFSLINE:LOB_CODE = "AUTO" Then
+            Begin
+        -- dec page
+
+            Access SCIPSCONTROL, Set SCIPSCONTROL:COMPANY_ID = L_COMPANY_ID,
+                                     SCIPSCONTROL:STATE      = L_STATE,
+                                     SCIPSCONTROL:LOB_CODE   = SFSLINE:LOB_CODE, Generic
+
+            Access SFPMASTER, Set SFPMASTER:POLICY_NO = G_POLICY_NO ,
+                                  SFPMASTER:POL_YEAR = G_YEAR,
+                                  SFPMASTER:END_SEQUENCE = G_END_SEQUENCE, Generic
+
+            If ((SFPMASTER:TRANS_CODE = 12 Or
+               SFPMASTER:TRANS_CODE = 13) and
+               sfpname:company_id = "FLEMINGTON") Then
+                Begin
+                L_REPORT = "hopsc16"
+                if scipscontrol:use_batch_dec_page = 1 then
+                    begin
+                    Include "sfsmacro1.inc"
+                    end
+                else
+                    begin
+                    include "sfsmacro.inc"
+                    end
+                End
+
+            L_REPORT = SCIPSCONTROL:DEC_PAGE_TO_USE
+
+            Include "sfsmacro1.inc"
+
+            Writefile(L_MACRO,"cli rm %s",Trun(L_MACRO))
+            Closefile(L_MACRO)
+            If SFSCOMPANY:DEBUG_MODE = 0 Then
+                Proc("cli cq %s",Trun(L_MACRO))/noconsole
+            Else
+                Proc("cli cq %s",Trun(L_MACRO))
+            End
+
+        L_COPIES_PRINTED = L_COPIES_PRINTED + 1
+        End
+    End
+Else
+    Begin
+    If SFSLINE:LOB_CODE = "AUTO" Then
+        Begin
+        -- dec page
+
+            Access SCIPSCONTROL, Set SCIPSCONTROL:COMPANY_ID = L_COMPANY_ID,
+                                     SCIPSCONTROL:STATE      = L_STATE,
+                                     SCIPSCONTROL:LOB_CODE   = SFSLINE:LOB_CODE, Generic
+
+            Access SFPMASTER, Set SFPMASTER:POLICY_NO = G_POLICY_NO ,
+                                  SFPMASTER:POL_YEAR = G_YEAR,
+                                  SFPMASTER:END_SEQUENCE = G_END_SEQUENCE, Generic
+
+            If ((SFPMASTER:TRANS_CODE = 12 Or
+               SFPMASTER:TRANS_CODE = 13) and
+               sfpname:company_id = "FLEMINGTON") Then
+                Begin
+                L_REPORT = "hopsc16"
+                if scipscontrol:use_batch_dec_page = 1 then
+                    begin
+                    Include "sfsmacro1.inc"
+                    end
+                else
+                    begin
+                    include "sfsmacro.inc"
+                    end
+                End
+
+        L_REPORT = SCIPSCONTROL:DEC_PAGE_TO_USE
+        Include "sfsmacro1.inc"
+
+        Writefile(L_MACRO,"cli rm %s",Trun(L_MACRO))
+        Closefile(L_MACRO)
+        If SFSCOMPANY:DEBUG_MODE = 0 Then
+            Proc("cli cq %s",Trun(L_MACRO))/noconsole
+        Else
+            Proc("cli cq %s",Trun(L_MACRO))
+        End
+    End
+
+/* end of get_macro */
+End
+
+Procedure CHECK_FOR_DUP_CODE
+Begin
+Access SFPPRINT3_FORM, Set SFPPRINT3_FORM:POLICY_NO = G_POLICY_NO,
+                           SFPPRINT3_FORM:POL_YEAR = G_YEAR,
+                           SFPPRINT3_FORM:END_SEQUENCE = G_END_SEQUENCE, Approximate
+
+L_HIT_CODE = "N"
+While SFPPRINT3_FORM:POLICY_NO = G_POLICY_NO And
+      SFPPRINT3_FORM:POL_YEAR = G_YEAR And
+      SFPPRINT3_FORM:END_SEQUENCE = G_END_SEQUENCE
+        Begin
+        If SFPPRINT3_FORM:CODE = L_HOLD_CODE Then
+            Begin
+            L_HIT_CODE = "Y"
+            End
+
+        Next SFPPRINT3_FORM
+        End
+
+End
+
+
+
+/* end of file */
+End

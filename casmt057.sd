@@ -1,0 +1,112 @@
+%%
+Screen
+        Name = "casmt057" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Binding Errors - Ver 7.00     %m" ;
+        domain="casbinding" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*----------------------------------------------------------------------------------*
+| Company Id:          __________  ___________________________________________     |
+| State Code:          __          ___________________________________________     |
+| Line Of Business:    ____        ___________________________________________     |
+| Effective Date:      __________                                                  |
+*----------------------------------------------------------------------------------*
+| No Vehicle:          __                                                          |
+|                                                                                  |
+|     Type         Original Cost:                                                  |
+|     __             ________                                                      |
+|     __             ________                                                      |
+|     __             ________                                                      |
+|     __             ________                                                      |
+|     __             ________                                                      |
+|     __             ________                                                      |
+|     __             ________                                                      |
+|     __             ________                                                      |
+|     __             ________                                                      |
+|                                                                                  |
+| Binding Description:-                                                            |
+| _______________________________________________________________________________  |
+*----------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASBINDING:COMPANY_ID                   Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASBINDING:STATE                        Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASBINDING:LINE_OF_BUSINESS             Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASBINDING:EFF_DATE                     Mandatory;
+801     CASBINDING:NO_VEHICLE;
+
+1101    CASBINDING:TYPE[1];
+1102    CASBINDING:ORIGINAL_COST[1];
+
+1201    CASBINDING:TYPE[2];
+1202    CASBINDING:ORIGINAL_COST[2];
+
+1301    CASBINDING:TYPE[3];
+1302    CASBINDING:ORIGINAL_COST[3];
+
+1401    CASBINDING:TYPE[4];
+1402    CASBINDING:ORIGINAL_COST[4];
+
+1501    CASBINDING:TYPE[5];
+1502    CASBINDING:ORIGINAL_COST[5];
+
+1601    CASBINDING:TYPE[6];
+1602    CASBINDING:ORIGINAL_COST[6];
+
+1701    CASBINDING:TYPE[7];
+1702    CASBINDING:ORIGINAL_COST[7];
+
+1801    CASBINDING:TYPE[8];
+1802    CASBINDING:ORIGINAL_COST[8];
+
+1901    CASBINDING:TYPE[9];
+1902    CASBINDING:ORIGINAL_COST[9];
+
+2201    CASBINDING:BINDING_DESCRIPTION;
+
+}
+
+End

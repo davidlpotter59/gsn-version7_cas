@@ -1,0 +1,112 @@
+%%
+Screen
+        Name = "casmt024" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Class Codes - Ver. 7.02     %m" ;
+        Domain = "CASCLASS" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip when CASCLASS:RECORD_KEY <> "CC" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ________________________________________       |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Type:             _     ________________________________________             |
+| Table:            _                                                          |
+| Class Code:       _____      ISO Class Code: _____                           |
+| Description:      __________________________________________________         |
+| Fleet:            __                                                         |
+| Hide From Agent:  _                                                          |
+| Fleet Class Code: _____                                                      |
+| Radius:           _                                                          |
+| Business Class:   _                                                          |
+| Size Class:       _                                                          |
+*------------------------------------------------------------------------------*
+
+
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASCLASS:RECORD_KEY = "CC"
+            CASCLASS:FILLER = ""
+            CASCLASS:DESCRIPTION1 = ""
+            End
+        End
+        CASCLASS:COMPANY_ID                     Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASCLASS:STATE                          Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASCLASS:LINE_OF_BUSINESS               Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASCLASS:TYPE                          Mandatory
+        If CASCLASS:TYPE <> CASTYPE:TYPE Then
+            Error 1262
+        Activehelp CASTYPE_ALIAS:TYPE,
+                   CASTYPE_ALIAS:DESCRIPTION ;
+602     CASTYPE:DESCRIPTION;
+701     CASCLASS:TABLE;
+801     CASCLASS:CLASS_CODE                     Mandatory;
+0802    casclass:iso_class_code ;
+901     CASCLASS:DESCRIPTION;
+1001    casclass:fleet/uppercase;
+1101    casclass:hide_from_agent/checkbox/values="0,1" ;
+1201    casclass:fleet_class_code ;
+1301    casclass:radius
+
+        activehelp casradius:radius/width=5,
+                   casradius:description/width=75 ;
+1401    casclass:business_class
+
+        activehelp casbusclass:class/width=5,
+                   casbusclass:description/width=75;
+1501    casclass:size_class
+
+        activehelp cassize:size/width=5 ,
+                   cassize:description/width=75 ;
+
+}
+
+End

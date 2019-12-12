@@ -1,0 +1,83 @@
+%%
+Screen
+        Name = "casmt061" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Miscellaneous Rates - Ver 7.00     %m" ;
+        domain="casmiscrates" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:        __________  _____________________________________________ |
+| State Code:        __          _____________________________________________ |
+| Line Of Business:  ____        _____________________________________________ |
+| Effective Date:    __________                                                |
+| Expiration Date:   __________                                                |
+*------------------------------------------------------------------------------*
+| Loss Free:         _____                                                     |
+| Seating Capacity:  ______                                                    |
+| Special Equipment: ______                                                    |
+| Business 1 year:   ______  ______                                            |
+| 2nd Year Venture:  ______  ______                                            |
+| 10 years or older: ______                                                    |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASMISCRATES:COMPANY_ID                 Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASMISCRATES:STATE                      Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASMISCRATES:LINE_OF_BUSINESS           Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASMISCRATES:EFF_DATE                   Mandatory;
+701     CASMISCRATES:EXP_DATE;
+901     CASMISCRATES:LOSS_FREE;
+1001    CASMISCRATES:SEATING_CAPACITY;
+1101    CASMISCRATES:SPECIAL_EQUIPMENT;
+1201    casmiscrates:venture_first_year[1] ;
+1202    casmiscrates:venture_first_year[2] ;
+1301    casmiscrates:venture_second_year[1] ;
+1302    casmiscrates:venture_second_year[2] ;
+1401    casmiscrates:age_factor ;
+
+}
+
+End

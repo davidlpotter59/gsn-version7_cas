@@ -1,0 +1,73 @@
+%%
+Screen
+        Name = "casmt069" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Owners Exp Scoring - Ver 7.00     %m" ;
+        domain="casownerexp" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        ________________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __          ______________________________________________ |
+| Line Of Business: ____        ______________________________________________ |
+| Owner Experience: ___                                                        |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+| Score:            ______                                                     |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASOWNEREXP:COMPANY_ID                  Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASOWNEREXP:STATE                       Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASOWNEREXP:LINE_OF_BUSINESS            Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASOWNEREXP:OWNER_EXPERIENCE            Mandatory;
+701     CASOWNEREXP:EFF_DATE                    Mandatory;
+801     CASOWNEREXP:EXP_DATE;
+1001    CASOWNEREXP:SCORE;
+
+}
+
+End

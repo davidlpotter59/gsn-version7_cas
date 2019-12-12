@@ -1,0 +1,77 @@
+%%
+Screen
+        Name = "casmt052" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Garagekeepers Deductibles - Ver 7.00     %m" ;
+        domain="casgaragededuct" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _____________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __     ___________________________________________________ |
+| Line Of Business: ____   ___________________________________________________ |
+| Type:             _                                                          |
+| Deductible:       _____                                                      |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+| Deductible Per Loss: _____                                                   |
+| Factor:              _____                                                   |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASGARAGEDEDUCT:COMPANY_ID              Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASGARAGEDEDUCT:STATE                   Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASGARAGEDEDUCT:LINE_OF_BUSINESS        Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASGARAGEDEDUCT:TYPE                    Mandatory;
+701     CASGARAGEDEDUCT:DEDUCTIBLE              Mandatory;
+801     CASGARAGEDEDUCT:EFF_DATE                Mandatory;
+901     CASGARAGEDEDUCT:EXP_DATE;
+1101    CASGARAGEDEDUCT:DEDUCTIBLE_PER_LOSS;
+1201    CASGARAGEDEDUCT:FACTOR;
+
+}
+
+End

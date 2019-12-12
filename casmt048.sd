@@ -1,0 +1,87 @@
+%%
+Screen
+        Name = "casmt048" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Personal Auto Liability - Ver 7.00     %m" ;
+        domain="casliability1" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+access validation
+skip if casliability1:record_key not one of "LI" or
+        sfsline:lob_code not one of "PAUTO"
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __     ___________________________________________________ |
+| Line Of Business: ____   ___________________________________________________ |
+| Territory Code:   ___                                                        |
+| Limit:            __________                                                 |
+| Full Tort:        _                                                          |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Charge:           _____
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     begin
+        if function one of "ADD" then
+            begin
+            casliability1:record_key = "LI"
+            casliability1:filler     = ""
+            end
+        end
+        CASLIABILITY1:COMPANY_ID                Mandatory
+        include "companyhlp.inc"
+302     sfscompany:Name[1] ;
+401     CASLIABILITY1:STATE                     Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASLIABILITY1:LINE_OF_BUSINESS          Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASLIABILITY1:TERRITORY                 Mandatory;
+701     CASLIABILITY1:LIMIT                     Mandatory;
+801     CASLIABILITY1:FULL_TORT/checkbox/values="0,1" ;
+901     CASLIABILITY1:EFF_DATE                  Mandatory;
+1101    CASLIABILITY1:CHARGE;
+
+}
+
+End

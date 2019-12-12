@@ -1,0 +1,95 @@
+%%
+Screen
+        Name = "casmt042" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Original Cost Factors - Ver 7.00     %m" ;
+        domain="casoriginalcost" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+access validation
+if casoriginalcost:record_key <> "OC" then
+    error 1000 ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:               __  ______________________________________________ |
+| Line Of Business:       ____  ______________________________________________ |
+| Type:                      _  ______________________________________________ |
+| Limit:            __________                                                 |
+| Eff Date:         __________                                                 |
+*------------------------------------------------------------------------------*
+| Comp Rate:            ______                                                 |
+| Coll Rate:            ______                                                 |
+| Dumping Rate:         ______                                                 |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     begin
+        if function one of "ADD" then
+            begin
+            casoriginalcost:record_key = "OC"
+            casoriginalcost:filler     = ""
+            end
+        end
+        CASORIGINALCOST:COMPANY_ID              Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASORIGINALCOST:STATE                   Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASORIGINALCOST:LINE_OF_BUSINESS        Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASORIGINALCOST:TYPE                    Mandatory
+        if casoriginalcost:type <> castype:type then
+            error "Invalid Type Entered"
+
+        activehelp castype_alias:type,
+                   castype_alias:description ;
+602     castype:description ;
+701     CASORIGINALCOST:LIMIT                   Mandatory;
+801     CASORIGINALCOST:REFF_DATE               Mandatory;
+1001    CASORIGINALCOST:COMP_RATE;
+1101    CASORIGINALCOST:COLL_RATE;
+1201    CASORIGINALCOST:DUMPING_RATE;
+
+}
+
+End

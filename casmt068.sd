@@ -1,0 +1,76 @@
+%%
+Screen
+        Name = "casmt068" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Vehicle Rating Type - Ver. 7.00    %m" ;
+        Domain = "castype_agent" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  _____________________________________________  |
+| State:            __    ____________________                                 |
+| Line Of Business: ____  ________________________________________             |
+| Type:             _                                                          |
+| Description: ____________________________________________________________    |
+| Show in Activehelp: _                                                        |
+*------------------------------------------------------------------------------*
+
+
+
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     castype_agent:COMPANY_ID                      Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     castype_agent:STATE                           Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     castype_agent:LINE_OF_BUSINESS                Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     castype_agent:TYPE                            Mandatory;
+701     castype_agent:DESCRIPTION;
+801     castype_agent:show_in_activehelp/checkbox/values="0,1" ;
+
+}
+
+End

@@ -1,0 +1,71 @@
+%%
+Screen
+        Name = "casmt037" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s ACV  Factors - Ver. 7.00    %m" ;
+        domain="casacv" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company ID:       __________  _____________________________________________  |
+| State:            __    _______________                                      |
+| Line Of Business: ____  ___________________________________________________  |
+| No Years:         ___                                                        |
+| Eff Date:         __________                                                 |
+*------------------------------------------------------------------------------*
+| Factor:           ______                                                     |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASACV:COMPANY_ID                       Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1];
+401     CASACV:STATE                            Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASACV:LINE_OF_BUSINESS                 Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASACV:NO_YEARS                         Mandatory;
+701     CASACV:REFF_DATE                        Mandatory;
+901     CASACV:FACTOR;
+
+}
+
+End

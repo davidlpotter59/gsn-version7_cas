@@ -1,0 +1,102 @@
+%%
+Screen
+        Name = "casmt030" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Nonstacked Uninsured/Underinsured - Ver. 7.00    %m" ;
+        Domain = "CASNONSTACKED" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASNONSTACKED:RECORD_KEY <> "NS" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:           __________  _________________________________________  |
+| State Code:           __    _______________                                  |
+| Line Of Business:     ____  ________________________________________         |
+| UM/UIM:               ___                                                    |
+| Limit:                __________                                             |
+| Effective Date:       __________                                             |
+*------------------------------------------------------------------------------*
+| Individuals                PP Types                 All Other Vehicles       |
+*------------------------------------------------------------------------------*
+|                            _______                       _______             |
+*------------------------------------------------------------------------------*
+| All Others                 PP Types                 All Other Vehicles       |
+*------------------------------------------------------------------------------*
+|                            _______                       _______             |
+*------------------------------------------------------------------------------*
+| Code: _______                           Code: _______                        |
+*------------------------------------------------------------------------------*
+| Individual or Married Couple Factor:  ______                                 |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASNONSTACKED:RECORD_KEY = "NS"
+            CASNONSTACKED:FILLER = ""
+            End
+        End
+        CASNONSTACKED:COMPANY_ID                 Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASNONSTACKED:STATE                      Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASNONSTACKED:LINE_OF_BUSINESS           Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASNONSTACKED:UM_UIM/uppercase
+        If CASNONSTACKED:UM_UIM <> "UM" And
+           CASNONSTACKED:UM_UIM <> "UIM" Then
+            Error "Valid codes are UM or UIM" ;
+701     CASNONSTACKED:LIMIT;
+801     CASNONSTACKED:EFF_DATE                   Mandatory;
+1201    CASNONSTACKED:CHARGE_1[1];
+1202    CASNONSTACKED:CHARGE_1[2];
+1601    CASNONSTACKED:CHARGE_1[3];
+1602    CASNONSTACKED:CHARGE_1[4];
+1801    CASNONSTACKED:CODE/uppercase ;
+1802    casnonstacked:property_code/uppercase ;
+2001    casnonstacked:individual_married_factor ;
+
+}
+
+End

@@ -1,0 +1,74 @@
+%%
+Screen
+        Name = "casmt076" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Violations Scores - Ver 7.00     %m" ;
+        domain="casviolations" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __          ______________________________________________ |
+| Line Of Business: ____        ______________________________________________ |
+| No Violations:    ____                                                       |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+| Minor Score:      ______         Major Score: _____                          |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASVIOLATIONS:COMPANY_ID                Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASVIOLATIONS:STATE                     Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASVIOLATIONS:LINE_OF_BUSINESS          Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASVIOLATIONS:NO_VIOLATIONS             Mandatory;
+701     CASVIOLATIONS:EFF_DATE                  Mandatory;
+801     CASVIOLATIONS:EXP_DATE;
+1001    CASVIOLATIONS:SCORE[1];
+1002    casviolations:score[2];
+
+}
+
+End

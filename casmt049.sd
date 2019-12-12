@@ -1,0 +1,79 @@
+%%
+Screen
+        Name = "casmt049" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Deductible Liability Coverage - Ver 7.00     %m" ;
+        domain="casliabdeduct" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __      __________________________________________________ |
+| Line Of Business: ____    __________________________________________________ |
+| Deductible1:      ______                                                     |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+|      Combined/Single Limit                         Property Damage           |
+| Non-Zone            Zone-                  Non-Zone              Zone-       |
+|  Rated              Rated                   Rated                Rated       |
+| _______            _______                 _______               _______     |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASLIABDEDUCT:COMPANY_ID                Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASLIABDEDUCT:STATE                     Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASLIABDEDUCT:LINE_OF_BUSINESS          Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASLIABDEDUCT:DEDUCTIBLE1               Mandatory;
+701     CASLIABDEDUCT:EFF_DATE                  Mandatory;
+801     CASLIABDEDUCT:EXP_DATE;
+1301    CASLIABDEDUCT:FACTOR[1];
+1302    casliabdeduct:factor[2];
+1303    casliabdeduct:factor[3];
+1304    casliabdeduct:factor[4];
+
+}
+
+End

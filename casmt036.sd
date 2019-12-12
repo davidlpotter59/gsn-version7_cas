@@ -1,0 +1,68 @@
+%%
+Screen
+        Name = "casmt036" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize= "dynamic" ;
+        Windowtitle = "%a     %s Medical Expense Deductibles - Ver. 7.00     %m" ;
+        Domain = "casmeddeduct" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        ______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ________________________________________       |
+| State Code:       __     _______________                                     |
+| Line Of Business: ____   ________________________________________            |
+| Deductible:       _____                                                      |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     casmeddeduct:COMPANY_ID                  Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     casmeddeduct:STATE                       Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     casmeddeduct:LINE_OF_BUSINESS            Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     casmeddeduct:DEDUCTIBLE                  Mandatory;
+701     casmeddeduct:EFF_DATE                    Mandatory;
+
+}
+
+End

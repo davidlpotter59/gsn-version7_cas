@@ -1,0 +1,150 @@
+%%
+Screen
+        Name = "casmt023" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Default File - Ver. 7.00    %m" ;
+        Domain = "CASDEFAULT" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:         __________  ____________________________________________ |
+| Line Of Business:   ____  ________________________________________           |
+*------------------------------------------------------------------------------*
+| State Code:         __           Antitheft Category I:   _                   |
+| County:             ___          Antitheft Category II:  _                   |
+| Territory:          ___          Antitheft Category III: _                   |
+| Auto Year:          ____         Antitheft Category IV:  _                   |
+| Type:               _            Size Class:             _                   |
+| Class Code:         _____        Business Class:         _                   |
+| Comp Deductible:    _____        Radius:                 _                   |
+| Coll Deductible:    _____        Secondary Class:        _                   |
+| Form Business:      _            Dumping:                _                   |
+| Liability;          ________     DOC Liability:          ________            |
+| UM/UIM:             ________     DOC Med Pay:            ____                |
+| Medical Payments:   ____         DOC UM/UIM:             ________            |
+| No Fault:           _            DOC Comp:               _  _____            |
+| Towing:             _            DOC Coll:               _  _____            |
+| Non-Employee:       _            PIP Extended Limit:     ______              |
+| Safety:             __           PIP Deductible:         _____               |
+| Cost of Hire        ______       Experience Rating: _______   _______        |
+| Vehicle Symbol:     _            Schedule Rating:   _______   _______        |
+| Hired Symbol:       _            Hired/Nonowned Min ________                 |
+| Nonowned Symbol:    _            Dev Number Not Factor:  _                   |
+| Use ACV Limit:      _            ACV Factor:             __                  |
+| ACV Warning:        _            Dont Print OPt End:     _                   |
+| Med Exp limit:      ________     Med Exp Deductible:     _____               |
+| UM/UIM different:   _            Default Rating Liab Limit: ________         |
+| Special Symbols:    _            Dont check serial no:   _                   |
+| Special PIP Screen: _            Dont check for mca825:  _  Date: __________ |
+| Rating Bureau:      ___          Extend Medical Expense: _                   |
+| Print Audit Inv:    _            Zipcode Eff Date:       __________          |
+*------------------------------------------------------------------------------*
+%%
+
+components
+
+Fields
+101     FUNCTION/noecho/showasguidetext ;
+301     CASDEFAULT:COMPANY_ID                   Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASDEFAULT:LINE_OF_BUSINESS             Mandatory
+        Include "linehlp.inc"
+402     SFSLINE:DESCRIPTION;
+601     CASDEFAULT:STATE;
+701     CASDEFAULT:COUNTY;
+801     CASDEFAULT:TERRITORY;
+901     CASDEFAULT:AUTO_YEAR;
+1001    CASDEFAULT:TYPE;
+1101    CASDEFAULT:CLASS_CODE;
+1201    CASDEFAULT:COMP_DEDUCTIBLE;
+1301    CASDEFAULT:COLL_DEDUCTIBLE;
+1401    CASDEFAULT:FORM_OF_BUSINESS;
+1501    CASDEFAULT:LIABILITY;
+1601    CASDEFAULT:UM_UIM_LIMIT;
+1701    CASDEFAULT:MEDICAL_PAYMENTS;
+1801    CASDEFAULT:NO_FAULT/checkbox/values="N,Y";
+1901    CASDEFAULT:TOWING/checkbox/values="N,Y";
+2001    CASDEFAULT:NON_EMPLOYEE/checkbox/values="N,Y";
+2101    CASDEFAULT:SAFETY;
+2201    CASDEFAULT:COST_OF_HIRE;
+2301    CASDEFAULT:VEHICLE_SYMBOL;
+2401    CASDEFAULT:HIRED_VEHICLE_SYMBOL;
+2501    CASDEFAULT:NONOWNED_VEHICLE_SYMBOL;
+2601    CASDEFAULT:USE_ACV_LIMIT/checkbox/values="0,1" ;
+2701    CASDEFAULT:WARNING_ON_ACV_LIMIT/checkbox/values="0,1";
+2801    CASDEFAULT:MEDICAL_EXP_LIMIT;
+2901    casdefault:different_um_uim/checkbox/values="0,1" ;
+3001    casdefault:special_symbol_screen/checkbox/values="0,1" ;
+3101    casdefault:special_pip_screen/checkbox/values="0,1" ;
+3201    casdefault:auto_rating_bureau ;
+3301    casdefault:print_audit_invoice/checkbox/values="0,1" ;
+
+602     CASDEFAULT:ANTITHEFT[1];
+702     CASDEFAULT:ANTITHEFT[2];
+802     CASDEFAULT:ANTITHEFT[3];
+902     CASDEFAULT:ANTITHEFT[4];
+1002    CASDEFAULT:SIZE_CLASS;
+1102    CASDEFAULT:BUSINESS_CLASS;
+1202    CASDEFAULT:RADIUS;
+1302    CASDEFAULT:SECONDARY_CLASS;
+1402    CASDEFAULT:DUMPING/checkbox/values="N,Y";
+1502    CASDEFAULT:DOC_LIABILITY;
+1602    CASDEFAULT:DOC_MED_PAY;
+1702    CASDEFAULT:DOC_UM_UIM_LIMIT;
+1802    CASDEFAULT:DOC_COMP/checkbox/values="N,Y";
+1803    CASDEFAULT:DOC_COMP_DEDUCTIBLE;
+1902    CASDEFAULT:DOC_COLL/checkbox/values="N,Y";
+1903    CASDEFAULT:DOC_COLL_DEDUCTIBLE;
+2002    CASDEFAULT:PIP_EXTENDED_LIMIT;
+2102    CASDEFAULT:PIP_DEDUCTIBLE;
+2202    CASDEFAULT:EXPERIENCE_RATING[1];
+2203    CASDEFAULT:EXPERIENCE_RATING[2];
+2302    CASDEFAULT:SCHEDULE_RATING[1];
+2303    CASDEFAULT:SCHEDULE_RATING[2];
+2402    CASDEFAULT:HIRED_NONOWNED_MINIMUM;
+2502    CASDEFAULT:DEVIATION_NUMBER_NOT_FACTOR/checkbox/values="0,1" ;
+2602    CASDEFAULT:ACV_FACTOR ;
+2702    CASDEFAULT:DONT_PRINT_OPT_END/checkbox/values="0,1";
+2802    CASDEFAULT:MEDICAL_EXP_DEDUCTIBLE;
+2902    casdefault:rating_liability_limit ;
+3002    casdefault:dont_check_serial_no/checkbox/values="0,1" ;
+3102    casdefault:dont_check_for_mca825/checkbox/values="0,1";
+3103    casdefault:dont_check_for_mca825_eff_date ;
+3202    casdefault:extend_medical_expense ;
+3302    casdefault:zipcode_rating_eff_date ;
+
+}
+
+End

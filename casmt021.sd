@@ -1,0 +1,85 @@
+%%
+Screen
+        Name = "casmt021" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Radius of Operation - Ver. 7.00    %m" ;
+        Domain = "CASRADIUS" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASRADIUS:RECORD_KEY <> "RD" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Radius:           _                                                          |
+*------------------------------------------------------------------------------*
+|               __________________________________________________             |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+|                                                                              |
+*------------------------------------------------------------------------------*
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASRADIUS:RECORD_KEY = "RD"
+            CASRADIUS:FILLER = ""
+            CASRADIUS:DESCRIPTION1 = ""
+            End
+        End
+        CASRADIUS:COMPANY_ID                      Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASRADIUS:STATE                           Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASRADIUS:LINE_OF_BUSINESS                Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASRADIUS:RADIUS                            Mandatory;
+801     CASRADIUS:DESCRIPTION/freetextlines=5 ;
+
+}
+
+End

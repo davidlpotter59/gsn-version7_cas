@@ -1,0 +1,87 @@
+%%
+Screen
+        Name = "casmt012" ;
+        Type = "Detail" ;
+        Padcharacter = Space ;
+        Highlite = Underscore ;
+        Screensize = "dynamic" ;
+        Windowtitle = "%a     %s Towing - Ver. 7.00    %m" ;
+        Domain = "CASTOWING" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+Access Validation
+Skip If CASTOWING:RECORD_KEY <> "TW" ;
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __    _________________________                            |
+| Line Of Business: ____  ________________________________________             |
+| Effective Date:   __________                                                 |
+*------------------------------------------------------------------------------*
+| Per:              __                                                         |
+| Charge:           ______                                                     |
+| Per Disablement:  ___                                                        |
+*------------------------------------------------------------------------------*
+
+
+
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     Begin
+        If FUNCTION = "ADD" Then
+            Begin
+            CASTOWING:RECORD_KEY = "TW"
+            CASTOWING:FILLER = ""
+            CASTOWING:DESCRIPTION = ""
+            End
+        End
+        CASTOWING:COMPANY_ID                    Mandatory
+        Include "companyhlp.inc"
+302     SFSCOMPANY:NAME[1];
+401     CASTOWING:STATE                         Mandatory
+        Include "statehlp.inc"
+402     SFSSTATE:DESCRIPTION;
+501     CASTOWING:LINE_OF_BUSINESS              Mandatory
+        Include "linehlp.inc"
+502     SFSLINE:DESCRIPTION;
+601     CASTOWING:EFF_DATE                      Mandatory;
+801     CASTOWING:PER;
+901     CASTOWING:CHARGE_1;
+1001    CASTOWING:PER_DISABLEMENT;
+
+}
+
+End

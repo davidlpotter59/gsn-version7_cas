@@ -1,0 +1,84 @@
+%%
+Screen
+        Name = "casmt066" ;
+        Type = "Detail" ;
+        padcharacter = space ;
+        highlight = underscore ;
+        screensize = "dynamic" ;
+        windowtitle = "%a     %s Paratransit Uninsured Motorist - Ver 7.00     %m" ;
+        domain="castransitumuim" ;
+--      resizeable = yes ;
+        iconline = 0 ;
+
+        Include "stdkeys7.inc"
+
+Style Definition
+
+        Include "styles.inc"
+
+Functions
+
+        add/reuse  tagged add_fn;
+
+        Include "stdfunc7.inc"
+
+Menu Definition
+
+        Include "stdmenu7.inc"
+
+}
+
+Toolbar Definition
+
+        Include "stdtoolbar7.inc"
+}
+
+screen
+{
+%%
+                                                        _______________
+*------------------------------------------------------------------------------*
+| Company Id:       __________  ______________________________________________ |
+| State Code:       __          ______________________________________________ |
+| Line Of Business: ____        ______________________________________________ |
+| Territory Code:   ___                                                        |
+| Class Code:       _____                                                      |
+| Radius:           ____                                                       |
+| Seating:          ___                                                        |
+| Effective Date:   __________                                                 |
+| Expiration Date:  __________                                                 |
+*------------------------------------------------------------------------------*
+| Charge:           _____            Factor:   ______                          |
+*------------------------------------------------------------------------------*
+| Minimum Premium:  ___     Property Damage:   _____                           |
+*------------------------------------------------------------------------------*
+
+%%
+
+components
+
+Fields
+        FUNCTION/noecho/showasguidetext ;
+301     CASTRANSITUMUIM:COMPANY_ID              Mandatory
+        include "companyhlp.inc"
+302     sfscompany:name[1] ;
+401     CASTRANSITUMUIM:STATE                   Mandatory
+        include "statehlp.inc"
+402     sfsstate:description ;
+501     CASTRANSITUMUIM:LINE_OF_BUSINESS        Mandatory
+        include "linehlp.inc"
+502     sfsline:description ;
+601     CASTRANSITUMUIM:TERRITORY               Mandatory;
+701     CASTRANSITUMUIM:CLASS_CODE              Mandatory;
+801     CASTRANSITUMUIM:RADIUS                  Mandatory;
+901     CASTRANSITUMUIM:SEATING                 Mandatory;
+1001    CASTRANSITUMUIM:EFF_DATE                Mandatory;
+1101    CASTRANSITUMUIM:EXP_DATE;
+1301    CASTRANSITUMUIM:CHARGE;
+1302    castransitumuim:factor ;
+1501    castransitumuim:minimum_premium ;
+1502    castransitumuim:property_damage_liability ;
+
+}
+
+End
